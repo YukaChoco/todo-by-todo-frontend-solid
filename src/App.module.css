@@ -49,7 +49,7 @@
   border: none;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   cursor: pointer;
-  z-index: 1000;
+  z-index: 1900;
   transition: background 0.2s;
 }
 .fab:hover {
@@ -65,7 +65,8 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  z-index: 1100;
+  z-index: 2000;
+  isolation: isolate;
 }
 .fabInputPopup {
   background: #fffbe7;
@@ -77,6 +78,8 @@
   flex-direction: column;
   gap: 12px;
   min-width: 260px;
+  position: relative;
+  z-index: 2001;
 }
 .fabInputPopup input {
   font-size: 1rem;
@@ -108,5 +111,5 @@
   font-size: 1.2rem;
   border: none;
   cursor: pointer;
-  z-index: 1200;
+  z-index: 9100;
 }

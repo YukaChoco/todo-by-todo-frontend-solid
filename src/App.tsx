@@ -1,15 +1,19 @@
 import { createSignal, onMount, type Component } from "solid-js";
 import { createStore } from "solid-js/store";
 import rough from "roughjs/bundled/rough.esm.js";
-import HanddrawnTabs from "./components/HanddrawnTabs";
-import HanddrawnSpeechBubble from "./components/HanddrawnSpeechBubble";
-import HanddrawnCheckbox from "./components/HanddrawnCheckbox";
-import HanddrawnIconButton from "./components/HanddrawnIconButton";
-import HanddrawnTaskCard from "./components/HanddrawnTaskCard";
-import HanddrawnProgressDisplay from "./components/HanddrawnProgressDisplay";
-import HanddrawnTaskDetail from "./components/HanddrawnTaskDetail";
-import DragArrowTrail from "./components/DragArrowTrail";
-import DrawingAnimation from "./components/DrawingAnimation";
+// UI components
+import HanddrawnTabs from "./components/ui/HanddrawnTabs";
+import HanddrawnSpeechBubble from "./components/ui/HanddrawnSpeechBubble";
+import HanddrawnCheckbox from "./components/ui/HanddrawnCheckbox";
+import HanddrawnIconButton from "./components/ui/HanddrawnIconButton";
+// Task components
+import HanddrawnTaskCard from "./components/task/HanddrawnTaskCard";
+import HanddrawnTaskDetail from "./components/task/HanddrawnTaskDetail";
+// Progress components
+import HanddrawnProgressDisplay from "./components/progress/HanddrawnProgressDisplay";
+// Animation components
+import DragArrowTrail from "./components/animation/DragArrowTrail";
+import DrawingAnimation from "./components/animation/DrawingAnimation";
 
 import styles from "./App.module.css";
 
@@ -289,53 +293,6 @@ const App: Component = () => {
             })}
         </div>
         
-        {/* フローティングボタンと入力欄 */}
-        <HanddrawnIconButton icon="plus" onClick={() => setShowInput(true)} title="追加" size={48} class={styles.fab} />
-        {showInput() && (
-          <div class={styles.fabInputOverlay} onClick={() => { setShowInput(false); setNewItem(""); setNewItemDetail(""); }}>
-            <div class={styles.fabInputPopup} onClick={e => e.stopPropagation()}>
-              <input
-                ref={el => setTimeout(() => el?.focus(), 0)}
-                type="text"
-                value={newItem()}
-                onInput={(e) => setNewItem(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                    addItem();
-                    setShowInput(false);
-                  }
-                }}
-                placeholder="タスク名を入力"
-              />
-              <textarea
-                value={newItemDetail()}
-                onInput={(e) => setNewItemDetail(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-                    addItem();
-                    setShowInput(false);
-                  }
-                }}
-                placeholder="詳細を入力（任意）"
-                style={{
-                  width: "100%",
-                  height: "80px",
-                  "margin-top": "8px",
-                  padding: "8px",
-                  border: "2px solid #ddd",
-                  "border-radius": "4px",
-                  "font-family": "inherit",
-                  "font-size": "14px",
-                  resize: "none"
-                }}
-              />
-              <div style={{ "margin-top": "8px", "font-size": "12px", color: "#666" }}>
-                Cmd+Enter で追加
-              </div>
-              <button onClick={() => { addItem(); setShowInput(false); }}>追加</button>
-            </div>
-          </div>
-        )}
         </div>
       </div>
       
@@ -363,6 +320,54 @@ const App: Component = () => {
           priority={selectedTask()!.priority}
           onClose={() => setSelectedTaskId(null)}
         />
+      )}
+
+      {/* フローティングボタンと入力欄 - Rough.js要素の外部に配置 */}
+      <HanddrawnIconButton icon="plus" onClick={() => setShowInput(true)} title="追加" size={48} class={styles.fab} />
+      {showInput() && (
+        <div class={styles.fabInputOverlay} onClick={() => { setShowInput(false); setNewItem(""); setNewItemDetail(""); }}>
+          <div class={styles.fabInputPopup} onClick={e => e.stopPropagation()}>
+            <input
+              ref={el => setTimeout(() => el?.focus(), 0)}
+              type="text"
+              value={newItem()}
+              onInput={(e) => setNewItem(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                  addItem();
+                  setShowInput(false);
+                }
+              }}
+              placeholder="タスク名を入力"
+            />
+            <textarea
+              value={newItemDetail()}
+              onInput={(e) => setNewItemDetail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                  addItem();
+                  setShowInput(false);
+                }
+              }}
+              placeholder="詳細を入力（任意）"
+              style={{
+                width: "100%",
+                height: "80px",
+                "margin-top": "8px",
+                padding: "8px",
+                border: "2px solid #ddd",
+                "border-radius": "4px",
+                "font-family": "inherit",
+                "font-size": "14px",
+                resize: "none"
+              }}
+            />
+            <div style={{ "margin-top": "8px", "font-size": "12px", color: "#666" }}>
+              Cmd+Enter で追加
+            </div>
+            <button onClick={() => { addItem(); setShowInput(false); }}>追加</button>
+          </div>
+        </div>
       )}
     </div>
   );

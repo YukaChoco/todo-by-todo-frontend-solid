@@ -1,7 +1,7 @@
 import { JSX, createMemo } from "solid-js";
 import HanddrawnPieChart from "./HanddrawnPieChart";
 import HanddrawnLargeNumber from "./HanddrawnLargeNumber";
-import HanddrawnIconButton from "./HanddrawnIconButton";
+import HanddrawnIconButton from "../ui/HanddrawnIconButton";
 import styles from "./HanddrawnProgressDisplay.module.css";
 
 interface HanddrawnProgressDisplayProps {

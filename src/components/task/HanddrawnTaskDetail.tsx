@@ -1,7 +1,7 @@
 import { createEffect, onMount, createSignal } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
-import HanddrawnIconButton from "./HanddrawnIconButton";
+import HanddrawnIconButton from "../ui/HanddrawnIconButton";
 import styles from "./HanddrawnTaskDetail.module.css";
 
 interface TaskDetailProps {
@@ -20,7 +20,7 @@ export default function HanddrawnTaskDetail(props: TaskDetailProps): JSX.Element
     if (svgRef) {
       svgRef.innerHTML = "";
       const rc = rough.svg(svgRef);
-      const rect = rc.rectangle(5, 5, 350, 390, {
+      const rect = rc.rectangle(5, 5, 320, 390, {
         stroke: "#222",
         strokeWidth: 2.5,
         fill: "#fffbe7",
@@ -39,7 +39,7 @@ export default function HanddrawnTaskDetail(props: TaskDetailProps): JSX.Element
     <div class={styles.container}>
       <svg
         ref={el => svgRef = el}
-        width={360}
+        width={330}
         height={400}
         class={styles.backgroundSvg}
       />
