@@ -20,17 +20,7 @@ const App: Component = () => {
   const [backgroundColor, setBackgroundColor] = createSignal<string>("#282c34");
 
   const addItem = () => {
-    setItems((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        name: newItem(),
-        completed: false,
-      },
-    ]);
-    setNewItem("");
-
-    const result = runCowInterpreter(cowPrograms, "58");
+    const result = runCowInterpreter(cowPrograms, newItem());
     console.log("Cow Interpreter Output:", result);
     console.log("Cow Interpreter Result length:", result.length);
     console.log(
@@ -42,6 +32,16 @@ const App: Component = () => {
       Array.from(result).map((c: string) => "0x" + c.charCodeAt(0).toString(16))
     );
     setCowOutput(result);
+
+    setItems((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        name: newItem(),
+        completed: false,
+      },
+    ]);
+    setNewItem("");
   };
 
   const deleteItem = (id: number) => {
