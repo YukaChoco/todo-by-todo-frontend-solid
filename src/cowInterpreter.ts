@@ -40,55 +40,63 @@ export function runCowInterpreter(code: string, input: string = ""): string {
   for (let i = 0; i < commands.length; i++) {
     const cmd = commands[i];
     if (cmd === "Moo" || cmd === "OOM") {
-      console.log(
-        `Command ${i}: ${cmd}, Pointer: ${pointer}, Memory[${pointer}]: ${memory[pointer]}, Output count: ${outputCount}`
-      );
+      // console.log(
+      //   `Command ${i}: ${cmd}, Pointer: ${pointer}, Memory[${pointer}]: ${memory[pointer]}, Output count: ${outputCount}`
+      // );
     }
+
+    console.log(memory.filter((_, index) => index < 10));
 
     switch (cmd) {
       case "moO": // ポインタをインクリメント
         pointer++;
-        console.log(
-          "moO pointer incremented / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "moO pointer incremented / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         if (pointer >= memory.length) {
-          console.log("pointer overflow");
+          console.error("pointer overflow");
           throw new Error("pointer overflow");
         }
         break;
       case "mOo": // ポインタをデクリメント
         if (pointer <= 0) {
-          console.log("pointer underflow");
+          console.error("pointer underflow");
           throw new Error("pointer underflow");
         }
         pointer--;
-        console.log(
-          "mOo pointer decremented / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "mOo pointer decremented / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "MoO": // ポインタの指す値をインクリメント
-        memory[pointer] = (memory[pointer] + 1) % 256;
-        console.log(
-          "MoO pointer incremented / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // MEMO: ポインタの指す値が255の場合は0になる方が良かったかも
+        memory[pointer] = memory[pointer] + 1;
+        // console.log(
+        //   "MoO pointer incremented / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "MOo": // ポインタの指す値をデクリメント
-        memory[pointer] = (memory[pointer] - 1 + 256) % 256;
-        console.log(
-          "MOo pointer decremented / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        if (memory[pointer] <= 0) {
+          console.error("memory[pointer] underflow");
+          throw new Error("memory[pointer] underflow");
+        }
+        // MEMO: ポインタの指す値が0の場合は255になる方が良かったかも
+        memory[pointer] = memory[pointer] - 1;
+        // console.log(
+        //   "MOo pointer decremented / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "oom": // 入力から1バイトをポインタの指す値に代入
         if (inputPointer < inputArray.length) {
@@ -96,69 +104,69 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         } else {
           memory[pointer] = 0;
         }
-        console.log(
-          "oom input read / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "oom input read / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "OOM": // ポインタの指す値をASCII文字として出力
         const char = String.fromCharCode(memory[pointer]);
         output += char;
         outputCount++;
-        console.log(
-          "OOM output / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer],
-          "char:",
-          char,
-          "output:",
-          output
-        );
+        // console.log(
+        //   "OOM output / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer],
+        //   "char:",
+        //   char,
+        //   "output:",
+        //   output
+        // );
         break;
       case "MOO": // ポインタの指す値が0なら、対応する「moo」にジャンプ
         if (memory[pointer] === 0) {
           i = jumpMap[i];
         }
-        console.log(
-          "MOO jump / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "MOO jump / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "moo": // ポインタの指す値が非0なら、対応する「MOO」にジャンプ
         if (memory[pointer] !== 0) {
           i = jumpMap[i];
         }
-        console.log(
-          "moo jump / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "moo jump / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "mOO": // ポインタの指す値を特定の命令として実行（3は無効）
         break;
       case "OOO": // ポインタの指す値に0を代入
         memory[pointer] = 0;
-        console.log(
-          "OOO memory[pointer] set to 0 / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "OOO memory[pointer] set to 0 / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "MMM": // レジスタに現在の値がない場合には現在のポインタの指す値をコピー。レジスタに値がある場合は、その値を現在のポインタの指す値に代入し、レジスタをクリアする
         memory[pointer] = memory[pointer];
-        console.log(
-          "MMM memory[pointer] set to memory[pointer] / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer]
-        );
+        // console.log(
+        //   "MMM memory[pointer] set to memory[pointer] / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer]
+        // );
         break;
       case "Moo": // ポインタの指す値が0なら「oom」、非0ならば「OOM」を実行
         if (memory[pointer] === 0) {
@@ -177,14 +185,14 @@ export function runCowInterpreter(code: string, input: string = ""): string {
           output += char;
           outputCount++;
         }
-        console.log(
-          "Moo output / pointer:",
-          pointer,
-          "memory[pointer]:",
-          memory[pointer],
-          "output:",
-          output
-        );
+        // console.log(
+        //   "Moo output / pointer:",
+        //   pointer,
+        //   "memory[pointer]:",
+        //   memory[pointer],
+        //   "output:",
+        //   output
+        // );
         break;
       default:
         break;

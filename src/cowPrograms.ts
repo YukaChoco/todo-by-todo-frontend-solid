@@ -15,7 +15,18 @@
 // ,[>,] <[.<]
 export const cowPrograms: string = `
 moO
-oom MOO moO oom moo
-mOo
-MOO OOM mOo moo
+oom
+moO oom
+
+MOO
+
+MOO
+MOo mOo MoO moO
+moo
+
+oom
+
+moo
+
+OOM
 `;
