@@ -31,12 +31,14 @@ export function useTodos() {
       const data = await response.json();
       console.log("data:", data);
       setItems([
-        ...data.map((item: ItemResponse) => ({
-          id: item.id,
-          title: item.title,
-          description: item.description.String,
-          completed: item.completed.Bool,
-        })),
+        ...data
+          .map((item: ItemResponse) => ({
+            id: item.id,
+            title: item.title,
+            description: item.description.String,
+            completed: item.completed.Bool,
+          }))
+          .reverse(), // 配列の順序を逆にして古い順に
       ]);
     } catch (error) {
       console.error("Error fetching todos:", error);
