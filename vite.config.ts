@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import solidPlugin from 'vite-plugin-solid';
+import { defineConfig } from "vite";
+import solidPlugin from "vite-plugin-solid";
 
 export default defineConfig({
   plugins: [solidPlugin()],
@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/todos": {
-        target: "https://todo.mazrean.com",
+        target: "https://todo.mazrean.com/api",
         changeOrigin: true,
       },
     },
