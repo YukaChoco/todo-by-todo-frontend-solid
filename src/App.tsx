@@ -16,17 +16,10 @@ import DragArrowTrail from "./components/animation/DragArrowTrail";
 import DrawingAnimation from "./components/animation/DrawingAnimation";
 import { useTodos } from "./hooks/useTodos";
 import styles from "./App.module.css";
-
-interface Item {
-  id: number;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import { runCowInterpreter } from "./cowInterpreter";
+import { cowPrograms } from "./cowPrograms";
 
 const App: Component = () => {
-  // Copy on Write (COW) pattern: Create new state objects instead of mutating
-  const [items, setItems] = createSignal<Item[]>([]);
   const [newItem, setNewItem] = createSignal<string>("");
   const [newItemDetail, setNewItemDetail] = createSignal<string>("");
   const [category, setCategory] = createSignal<string>("すべて");
@@ -34,16 +27,26 @@ const App: Component = () => {
   const [showInput, setShowInput] = createSignal(false);
   const [showProgress, setShowProgress] = createSignal(true);
   const [selectedTaskId, setSelectedTaskId] = createSignal<number | null>(null);
+  const [backgroundColor, setBackgroundColor] = createSignal<string>("#282c34");
   let svgRef: SVGSVGElement | undefined;
-  
+
   // useTodosフックから基本的なCRUD操作を取得
-  const { items: baseItems, loading, fetchData, addItem: baseAddItem, toggleItem: baseToggleItem, deleteItem: baseDeleteItem } = useTodos();
-  
+  const {
+    items: baseItems,
+    loading,
+    fetchData,
+    addItem: baseAddItem,
+    toggleItem: baseToggleItem,
+    deleteItem: baseDeleteItem,
+  } = useTodos();
+
   // 基本アイテムをそのまま使用（priorityフィールドを削除）
   const items = () => baseItems();
-  
+
   // タスクIDごとのランダム座標を保持
-  const [positions, setPositions] = createStore<Record<number, {top: number, left: number}>>({});
+  const [positions, setPositions] = createStore<
+    Record<number, { top: number; left: number }>
+  >({});
   // ドラッグ&ドロップ状態
   const [dragState, setDragState] = createSignal<{
     isActive: boolean;
@@ -76,12 +79,28 @@ const App: Component = () => {
   });
 
   const addItem = async () => {
+    const result = runCowInterpreter(cowPrograms, newItem());
+    // console.log("Cow Interpreter Output:", result);
+    // console.log("Cow Interpreter Result length:", result.length);
+    // console.log(
+    //   "Cow Interpreter Result bytes:",
+    //   Array.from(result).map((c: string) => c.charCodeAt(0))
+    // );
+    // console.log(
+    //   "Cow Interpreter Result hex:",
+    //   Array.from(result).map((c: string) => "0x" + c.charCodeAt(0).toString(16))
+    // );
+    const hue = result[0].charCodeAt(0);
+    const hsl = `hsl(${result[0].charCodeAt(0)}, 90%, 85%)`;
+    console.log(`hsl(${result[0].charCodeAt(0)}, 90%, 85%)`);
+    setBackgroundColor(hsl);
+
     if (!newItem().trim()) {
       setError("タスク名を入力してください");
       setTimeout(() => setError(""), 3000);
       return;
     }
-    
+
     // アニメーションの準備
     const id = items().length + 1;
     const newPosition = {
@@ -89,66 +108,32 @@ const App: Component = () => {
       left: Math.floor(Math.random() * 400),
     };
     setPositions(id, newPosition);
-    
+
     // アニメーションを開始
-    const rect = document.querySelector('.main-container')?.getBoundingClientRect();
+    const rect = document
+      .querySelector(".main-container")
+      ?.getBoundingClientRect();
     const targetX = (rect?.left || 0) + newPosition.left + 75;
     const targetY = (rect?.top || 0) + newPosition.top + 75;
-    
+
     setAnimationState({
       isActive: true,
-      targetPosition: { x: targetX, y: targetY }
+      targetPosition: { x: targetX, y: targetY },
     });
-    
+
     // APIを通じてアイテムを追加（titleとdescriptionを分けて送信）
     await baseAddItem(newItem(), newItemDetail());
-
-  // COW Interpreter for dynamic UI effects
-  const [cowOutput, setCowOutput] = createSignal<string>("");
-  const [backgroundColor, setBackgroundColor] = createSignal<string>("#282c34");
-
-  const addItem = () => {
-    const result = runCowInterpreter(cowPrograms, newItem());
-    console.log("Cow Interpreter Output:", result);
-    console.log("Cow Interpreter Result length:", result.length);
-    console.log(
-      "Cow Interpreter Result bytes:",
-      Array.from(result).map((c: string) => c.charCodeAt(0))
-    );
-    console.log(
-      "Cow Interpreter Result hex:",
-      Array.from(result).map((c: string) => "0x" + c.charCodeAt(0).toString(16))
-    );
-    const hsl = `hsl(${result[0].charCodeAt(0)}, 90%, 85%)`;
-    setBackgroundColor(hsl);
-    setCowOutput(result);
-
-    setItems((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        name: newItem(),
-        completed: false,
-      },
-    ]);
-    setNewItem("");
-    setNewItemDetail("");
-    
-    // アニメーション終了
-    setTimeout(() => {
-      setAnimationState(prev => ({ ...prev, isActive: false }));
-    }, 400);
   };
 
   const toggleItem = async (id: number) => {
-    const item = baseItems().find(item => item.id === id);
+    const item = baseItems().find((item) => item.id === id);
     if (item) {
       await baseToggleItem(item);
     }
   };
 
   const deleteItem = async (id: number) => {
-    const item = baseItems().find(item => item.id === id);
+    const item = baseItems().find((item) => item.id === id);
     if (item) {
       await baseDeleteItem(item);
     }
@@ -156,22 +141,25 @@ const App: Component = () => {
 
   // カテゴリでフィルタリング
   const filteredItems = () => {
-    if (category() === "未完了") return items().filter((item) => !item.completed);
+    if (category() === "未完了")
+      return items().filter((item) => !item.completed);
     if (category() === "完了") return items().filter((item) => item.completed);
     return items();
   };
 
   // 進捗計算（リアクティブ）
   const totalTasks = () => items().length;
-  const completedTasks = () => items().filter(item => item.completed).length;
-  
+  const completedTasks = () => items().filter((item) => item.completed).length;
+
   // 選択されたタスクを動的に取得（リアクティブ）
   const selectedTask = () => {
     const taskId = selectedTaskId();
-    const task = taskId ? items().find(item => item.id === taskId) || null : null;
+    const task = taskId
+      ? items().find((item) => item.id === taskId) || null
+      : null;
     if (task) {
-      console.log("Selected task:", task);
-      console.log("Task description:", task.description);
+      // console.log("Selected task:", task);
+      // console.log("Task description:", task.description);
     }
     return task;
   };
@@ -179,93 +167,122 @@ const App: Component = () => {
   // ドラッグ&ドロップハンドラー
   const handleDragStart = (taskId: number, initialMouseEvent: MouseEvent) => {
     const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
-    const mainContainer = document.querySelector('.main-container');
-    
+    const mainContainer = document.querySelector(".main-container");
+
     if (taskElement && mainContainer) {
       const taskRect = taskElement.getBoundingClientRect();
       const containerRect = mainContainer.getBoundingClientRect();
-      
+
       // 現在のタスクの位置（コンテナ相対）を取得
       const currentPosition = positions[taskId];
       if (!currentPosition) return;
-      
+
       // マウスカーソルとタスクカードの左上角との相対位置を計算（現在の位置ベース）
-      const offsetX = initialMouseEvent.clientX - (containerRect.left + currentPosition.left);
-      const offsetY = initialMouseEvent.clientY - (containerRect.top + currentPosition.top);
-      
+      const offsetX =
+        initialMouseEvent.clientX - (containerRect.left + currentPosition.left);
+      const offsetY =
+        initialMouseEvent.clientY - (containerRect.top + currentPosition.top);
+
       setDragState({
         isActive: true,
-        startPoint: { x: taskRect.left + taskRect.width / 2, y: taskRect.top + taskRect.height / 2 },
-        endPoint: { x: initialMouseEvent.clientX, y: initialMouseEvent.clientY },
+        startPoint: {
+          x: taskRect.left + taskRect.width / 2,
+          y: taskRect.top + taskRect.height / 2,
+        },
+        endPoint: {
+          x: initialMouseEvent.clientX,
+          y: initialMouseEvent.clientY,
+        },
         taskId,
-        offset: { x: offsetX, y: offsetY }
+        offset: { x: offsetX, y: offsetY },
       });
-      
+
       // マウス移動を追跡
       const handleMouseMove = (e: MouseEvent) => {
-        setDragState(prev => ({
+        setDragState((prev) => ({
           ...prev,
-          endPoint: { x: e.clientX, y: e.clientY }
+          endPoint: { x: e.clientX, y: e.clientY },
         }));
-        
+
         // タスクの位置を更新（オフセットを考慮）
         const newLeft = e.clientX - containerRect.left - offsetX;
         const newTop = e.clientY - containerRect.top - offsetY;
-        
+
         setPositions(taskId, {
           top: Math.max(0, Math.min(500, newTop)),
-          left: Math.max(0, Math.min(400, newLeft))
+          left: Math.max(0, Math.min(400, newLeft)),
         });
       };
-      
+
       const handleMouseUp = () => {
-        setDragState(prev => ({ ...prev, isActive: false }));
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        setDragState((prev) => ({ ...prev, isActive: false }));
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
       };
-      
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
   };
 
   const handleDragEnd = () => {
-    setDragState(prev => ({ ...prev, isActive: false }));
+    setDragState((prev) => ({ ...prev, isActive: false }));
   };
 
   return (
-    <div style={{ display: "flex", gap: "20px", margin: "40px auto", "max-width": "1200px" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: "20px",
+        margin: "40px auto",
+        "max-width": "1200px",
+      }}
+    >
       {/* 進捗表示サイドパネル */}
       {showProgress() && (
-        <div style={{ 
-          position: "fixed", 
-          left: "20px", 
-          top: "20px", 
-          'z-index': 1000,
-          background: "rgba(255, 251, 231, 0.95)",
-          "border-radius": "12px",
-          padding: "10px",
-          "box-shadow": "0 4px 12px rgba(0, 0, 0, 0.15)"
-        }}>
-          <HanddrawnProgressDisplay 
-            totalTasks={totalTasks()} 
+        <div
+          style={{
+            position: "fixed",
+            left: "20px",
+            top: "20px",
+            "z-index": 1000,
+            background: "rgba(255, 251, 231, 0.95)",
+            "border-radius": "12px",
+            padding: "10px",
+            "box-shadow": "0 4px 12px rgba(0, 0, 0, 0.15)",
+          }}
+        >
+          <HanddrawnProgressDisplay
+            totalTasks={totalTasks()}
             completedTasks={completedTasks()}
             onClose={() => setShowProgress(false)}
           />
         </div>
       )}
-      
+
       {/* メインTodoアプリ */}
-      <div class="main-container" style={{ position: "relative", width: "600px", height: "800px", margin: "0 auto" }}>
+      <div
+        class="main-container"
+        style={{
+          position: "relative",
+          width: "600px",
+          height: "800px",
+          margin: "0 auto",
+        }}
+      >
         <svg
-          ref={el => svgRef = el}
+          ref={(el) => (svgRef = el)}
           width={600}
           height={800}
-          style={{ position: "absolute", top: 0, left: 0, 'z-index': 0 }}
+          style={{ position: "absolute", top: 0, left: 0, "z-index": 0 }}
         />
-        <div style={{ position: "relative", 'z-index': 1, padding: "20px" }}>
-          <HanddrawnSpeechBubble message={error()} visible={!!error()} onClose={() => setError("")} />
-          
+        <div style={{ position: "relative", "z-index": 1, padding: "20px" }}>
+          <HanddrawnSpeechBubble
+            message={error()}
+            visible={!!error()}
+            onClose={() => setError("")}
+          />
+
           {/* 進捗表示トグルボタン */}
           {!showProgress() && (
             <button
@@ -279,8 +296,8 @@ const App: Component = () => {
                 "border-radius": "8px",
                 padding: "8px 12px",
                 cursor: "pointer",
-                'z-index': 1000,
-                "font-weight": "bold"
+                "z-index": 1000,
+                "font-weight": "bold",
               }}
               onClick={() => setShowProgress(true)}
               title="進捗表示を開く"
@@ -288,19 +305,27 @@ const App: Component = () => {
               📊 進捗
             </button>
           )}
-          
+
           <HanddrawnTabs
             tabs={["すべて", "未完了", "完了"]}
             selected={category()}
             onSelect={setCategory}
           />
-          
+
           <div style={{ position: "relative" }}>
             <h1>Todo List</h1>
           </div>
-        
-        {/* タスクカード配置エリア */}
-        <div style={{ position: "absolute", top: "70px", left: "20px", width: "560px", height: "650px" }}>
+
+          {/* タスクカード配置エリア */}
+          <div
+            style={{
+              position: "absolute",
+              top: "70px",
+              left: "20px",
+              width: "560px",
+              height: "650px",
+            }}
+          >
             {filteredItems().map((item) => {
               // 既存の位置を参照、なければ初期化
               let pos = positions[item.id];
@@ -312,13 +337,19 @@ const App: Component = () => {
                 setPositions(item.id, pos);
               }
               return (
-                <div 
+                <div
                   data-task-id={item.id}
-                  style={{ position: "absolute", top: `${pos.top}px`, left: `${pos.left}px`, "z-index": item.id }}
+                  style={{
+                    position: "absolute",
+                    top: `${pos.top}px`,
+                    left: `${pos.left}px`,
+                    "z-index": item.id,
+                  }}
                 >
                   <HanddrawnTaskCard
                     name={item.title}
                     completed={item.completed}
+                    hue={item.hue}
                     priority="medium"
                     onDragStart={(e) => handleDragStart(item.id, e)}
                     onDragEnd={handleDragEnd}
@@ -329,31 +360,36 @@ const App: Component = () => {
                         checked={item.completed}
                         onChange={() => toggleItem(item.id)}
                       />,
-                      <HanddrawnIconButton icon="x" onClick={() => deleteItem(item.id)} title="削除" />
+                      <HanddrawnIconButton
+                        icon="x"
+                        onClick={() => deleteItem(item.id)}
+                        title="削除"
+                      />,
                     ]}
                   </HanddrawnTaskCard>
                 </div>
               );
             })}
-        </div>
-        
+          </div>
         </div>
       </div>
-      
+
       {/* ドラッグ時の軌跡表示 */}
       <DragArrowTrail
         isVisible={dragState().isActive}
         startPoint={dragState().startPoint}
         endPoint={dragState().endPoint}
       />
-      
+
       {/* タスク追加時のアニメーション */}
       <DrawingAnimation
         isVisible={animationState().isActive}
         targetPosition={animationState().targetPosition}
-        onAnimationComplete={() => setAnimationState(prev => ({ ...prev, isActive: false }))}
+        onAnimationComplete={() =>
+          setAnimationState((prev) => ({ ...prev, isActive: false }))
+        }
       />
-      
+
       {/* タスク詳細表示 */}
       {selectedTask() && (
         <HanddrawnTaskDetail
@@ -367,17 +403,33 @@ const App: Component = () => {
       )}
 
       {/* フローティングボタンと入力欄 - Rough.js要素の外部に配置 */}
-      <HanddrawnIconButton icon="plus" onClick={() => setShowInput(true)} title="追加" size={48} class={styles.fab} />
+      <HanddrawnIconButton
+        icon="plus"
+        onClick={() => setShowInput(true)}
+        title="追加"
+        size={48}
+        class={styles.fab}
+      />
       {showInput() && (
-        <div class={styles.fabInputOverlay} onClick={() => { setShowInput(false); setNewItem(""); setNewItemDetail(""); }}>
-          <div class={styles.fabInputPopup} onClick={e => e.stopPropagation()}>
+        <div
+          class={styles.fabInputOverlay}
+          onClick={() => {
+            setShowInput(false);
+            setNewItem("");
+            setNewItemDetail("");
+          }}
+        >
+          <div
+            class={styles.fabInputPopup}
+            onClick={(e) => e.stopPropagation()}
+          >
             <input
-              ref={el => setTimeout(() => el?.focus(), 0)}
+              ref={(el) => setTimeout(() => el?.focus(), 0)}
               type="text"
               value={newItem()}
               onInput={(e) => setNewItem(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   addItem();
                   setShowInput(false);
                 }
@@ -388,7 +440,7 @@ const App: Component = () => {
               value={newItemDetail()}
               onInput={(e) => setNewItemDetail(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   addItem();
                   setShowInput(false);
                 }
@@ -403,13 +455,25 @@ const App: Component = () => {
                 "border-radius": "4px",
                 "font-family": "inherit",
                 "font-size": "14px",
-                resize: "none"
+                resize: "none",
               }}
             />
-            <div style={{ "margin-top": "8px", "font-size": "12px", color: "#666" }}>
+            <div
+              style={{
+                "margin-top": "8px",
+                "font-size": "12px",
+                color: "#666",
+              }}
+            >
               Cmd+Enter で追加
             </div>
-            <button onClick={() => { addItem(); setShowInput(false); }} disabled={loading()}>
+            <button
+              onClick={() => {
+                addItem();
+                setShowInput(false);
+              }}
+              disabled={loading()}
+            >
               {loading() ? "追加中..." : "追加"}
             </button>
           </div>

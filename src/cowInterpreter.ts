@@ -5,10 +5,10 @@ export function runCowInterpreter(code: string, input: string = ""): string {
   const inputArray = input.split("");
   let inputPointer = 0;
 
-  console.log("code:", code);
-  console.log("input:", input);
+  // console.log("code:", code);
+  // console.log("input:", input);
 
-  console.log("first pointer:", pointer, "memory[pointer]:", memory[pointer]);
+  // console.log("first pointer:", pointer, "memory[pointer]:", memory[pointer]);
 
   // Tokenize the code
   const regex = /(?:moO|mOo|MoO|MOo|oom|OOM|MOO|moo|mOO|OOO|MMM|Moo)/g;
@@ -40,34 +40,34 @@ export function runCowInterpreter(code: string, input: string = ""): string {
   for (let i = 0; i < commands.length; i++) {
     const cmd = commands[i];
     if (cmd === "Moo" || cmd === "OOM") {
-      // console.log(
+      // // console.log(
       //   `Command ${i}: ${cmd}, Pointer: ${pointer}, Memory[${pointer}]: ${memory[pointer]}, Output count: ${outputCount}`
       // );
     }
 
-    // console.log(memory.filter((_, index) => index < 10));
+    // // console.log(memory.filter((_, index) => index < 10));
 
     switch (cmd) {
       case "moO": // ポインタをインクリメント
         pointer++;
-        // console.log(
+        // // console.log(
         //   "moO pointer incremented / pointer:",
         //   pointer,
         //   "memory[pointer]:",
         //   memory[pointer]
         // );
         if (pointer >= memory.length) {
-          console.error("pointer overflow");
+          // console.error("pointer overflow");
           throw new Error("pointer overflow");
         }
         break;
       case "mOo": // ポインタをデクリメント
         if (pointer <= 0) {
-          console.error("pointer underflow");
+          // console.error("pointer underflow");
           throw new Error("pointer underflow");
         }
         pointer--;
-        // console.log(
+        // // console.log(
         //   "mOo pointer decremented / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -77,7 +77,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
       case "MoO": // ポインタの指す値をインクリメント
         // MEMO: ポインタの指す値が255の場合は0になる方が良かったかも
         memory[pointer] = memory[pointer] + 1;
-        // console.log(
+        // // console.log(
         //   "MoO pointer incremented / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -86,12 +86,12 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         break;
       case "MOo": // ポインタの指す値をデクリメント
         if (memory[pointer] <= 0) {
-          console.error("memory[pointer] underflow");
+          // console.error("memory[pointer] underflow");
           throw new Error("memory[pointer] underflow");
         }
         // MEMO: ポインタの指す値が0の場合は255になる方が良かったかも
         memory[pointer] = memory[pointer] - 1;
-        // console.log(
+        // // console.log(
         //   "MOo pointer decremented / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -104,7 +104,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         } else {
           memory[pointer] = 0;
         }
-        // console.log(
+        // // console.log(
         //   "oom input read / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -130,7 +130,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         if (memory[pointer] === 0) {
           i = jumpMap[i];
         }
-        // console.log(
+        // // console.log(
         //   "MOO jump / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -141,7 +141,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         if (memory[pointer] !== 0) {
           i = jumpMap[i];
         }
-        // console.log(
+        // // console.log(
         //   "moo jump / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -152,7 +152,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         break;
       case "OOO": // ポインタの指す値に0を代入
         memory[pointer] = 0;
-        // console.log(
+        // // console.log(
         //   "OOO memory[pointer] set to 0 / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -161,7 +161,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         break;
       case "MMM": // レジスタに現在の値がない場合には現在のポインタの指す値をコピー。レジスタに値がある場合は、その値を現在のポインタの指す値に代入し、レジスタをクリアする
         memory[pointer] = memory[pointer];
-        // console.log(
+        // // console.log(
         //   "MMM memory[pointer] set to memory[pointer] / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -185,7 +185,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
           output += char;
           outputCount++;
         }
-        // console.log(
+        // // console.log(
         //   "Moo output / pointer:",
         //   pointer,
         //   "memory[pointer]:",
@@ -199,7 +199,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
     }
   }
 
-  console.log("Execution completed. Final output:", output);
-  console.log("Final memory state (first 20 cells):", memory.slice(0, 20));
+  // console.log("Execution completed. Final output:", output);
+  // console.log("Final memory state (first 20 cells):", memory.slice(0, 20));
   return output;
 }

@@ -6,6 +6,7 @@ import styles from "./HanddrawnTaskCard.module.css";
 interface HanddrawnTaskCardProps {
   name: string;
   completed: boolean;
+  hue: number;
   priority: "high" | "medium" | "low";
   children: JSX.Element[];
   onDragStart?: (e: MouseEvent) => void;
@@ -27,9 +28,9 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
       const rc = rough.svg(svgRef);
       // 付箋紙風の四角形
       const rect = rc.rectangle(2, 2, 146, 146, {
-        stroke: isDragging() ? "#e67e22" : "#b59b5b",
+        stroke: isDragging() ? `hsl(${props.hue}, 40%, 65%)` : `hsl(${props.hue}, 50%, 65%)`,
         strokeWidth: isDragging() ? 3.5 : 2.5,
-        fill: isDragging() ? "#ffe5b4" : "#fff9c4", // 淡い黄色
+        fill: isDragging() ? `hsl(${props.hue}, 90%, 75%)` : `hsl(${props.hue}, 90%, 85%)`,
         fillStyle: "solid",
         roughness: 2.2,
         bowing: 2.5,
@@ -46,13 +47,13 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
     if (underlineRef) {
       underlineRef.innerHTML = "";
       const rc = rough.svg(underlineRef);
-      let color = "#e67e22";
+      let color = `hsl(${props.hue}, 90%, 65%)`;
       let strokeWidth = 2.5;
       if (props.priority === "high") {
-        color = "#e74c3c";
+        color = `hsl(${props.hue}, 90%, 65%)`;
         strokeWidth = 4.5;
       } else if (props.priority === "low") {
-        color = "#3498db";
+        color = `hsl(${props.hue}, 90%, 65%)`;
         strokeWidth = 2;
       }
       // 手書き風アンダーライン
@@ -76,7 +77,7 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
         const rc = rough.svg(highlightRef);
         // 手書き風のハイライト効果
         const highlight = rc.rectangle(0, 0, 150, 150, {
-          stroke: "#e67e22",
+          stroke: `hsl(${props.hue}, 90%, 65%)`,
           strokeWidth: 1.5,
           fill: "none",
           roughness: 3,
@@ -88,14 +89,14 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
         const star1 = rc.linearPath([
           [140, 10], [145, 15], [140, 20]
         ], {
-          stroke: "#e67e22",
+          stroke: `hsl(${props.hue}, 90%, 65%)`,
           strokeWidth: 2,
           roughness: 2,
         });
         const star2 = rc.linearPath([
           [142, 12], [142, 18]
         ], {
-          stroke: "#e67e22",
+          stroke: `hsl(${props.hue}, 90%, 65%)`,
           strokeWidth: 2,
           roughness: 2,
         });

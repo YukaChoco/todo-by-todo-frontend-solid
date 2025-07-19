@@ -3,7 +3,6 @@
   width: 150px;
   height: 150px;
   margin: 12px;
-  background-color: #fff9c4;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -42,7 +41,7 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background-color: rgba(255, 249, 196, 0.9);
+  background-color: rgba(255, 255, 255, 0.7);
   border-radius: 2px;
 }
 

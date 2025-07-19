@@ -1,10 +1,13 @@
 import { createSignal } from "solid-js";
+import { cowPrograms } from "../cowPrograms";
+import { runCowInterpreter } from "../cowInterpreter";
 
 interface Item {
   id: number;
   title: string;
   description: string;
   completed: boolean;
+  hue: number;
 }
 
 // TODO: レスポンスが治ったらもどす
@@ -25,29 +28,35 @@ export function useTodos() {
     try {
       const response = await fetch("/todos");
       const data = await response.json();
-      console.log("data:", data);
+      // console.log("data:", data);
       setItems([
         ...data
           .map((item: ItemResponse) => {
-            console.log("Processing item:", item);
-            console.log("Description structure:", item.description);
-            console.log("Description value:", item.description);
-            
+            // console.log("Processing item:", item);
+            // console.log("Description structure:", item.description);
+            // console.log("Description value:", item.description);
+
             // descriptionの安全な取得
             const description = item.description || "";
-            console.log("Final description:", description);
-            
+            // console.log("Final description:", description);
+            const result = runCowInterpreter(
+              cowPrograms,
+              item.title + description
+            );
+            const hue = Number(result[0].charCodeAt(0));
+
             return {
               id: item.id,
               title: item.title,
               description: description,
               completed: item.completed,
+              hue: hue,
             };
           })
           .reverse(), // 配列の順序を逆にして古い順に
       ]);
     } catch (error) {
-      console.error("Error fetching todos:", error);
+      // console.error("Error fetching todos:", error);
     } finally {
       setLoading(false);
     }
@@ -76,7 +85,7 @@ export function useTodos() {
       // ローカル状態を更新（refetchしない）
       fetchData();
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -109,7 +118,7 @@ export function useTodos() {
         )
       );
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -128,7 +137,7 @@ export function useTodos() {
 
       setItems((prev) => prev.filter((i) => i.id !== item.id));
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
     } finally {
       setLoading(false);
     }
