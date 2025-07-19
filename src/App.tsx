@@ -16,7 +16,6 @@ const App: Component = () => {
 
   // COW Interpreter for dynamic UI effects
   const [cowOutput, setCowOutput] = createSignal<string>("");
-  const [cowPattern, setCowPattern] = createSignal<string>("");
   const [backgroundColor, setBackgroundColor] = createSignal<string>("#282c34");
 
   const addItem = () => {
@@ -31,6 +30,8 @@ const App: Component = () => {
       "Cow Interpreter Result hex:",
       Array.from(result).map((c: string) => "0x" + c.charCodeAt(0).toString(16))
     );
+    const hsl = `hsl(${result[0].charCodeAt(0)}, 90%, 85%)`;
+    setBackgroundColor(hsl);
     setCowOutput(result);
 
     setItems((prev) => [
@@ -63,7 +64,10 @@ const App: Component = () => {
 
   return (
     <div class={styles.App}>
-      <header class={styles.header}>
+      <header
+        class={styles.header}
+        style={{ "background-color": backgroundColor() }}
+      >
         <div class={styles.headerContent}>
           <h1>Todo List</h1>
           <div class={styles.headerContentRight}>

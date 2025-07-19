@@ -45,7 +45,7 @@ export function runCowInterpreter(code: string, input: string = ""): string {
       // );
     }
 
-    console.log(memory.filter((_, index) => index < 10));
+    // console.log(memory.filter((_, index) => index < 10));
 
     switch (cmd) {
       case "moO": // ポインタをインクリメント
@@ -115,16 +115,16 @@ export function runCowInterpreter(code: string, input: string = ""): string {
         const char = String.fromCharCode(memory[pointer]);
         output += char;
         outputCount++;
-        // console.log(
-        //   "OOM output / pointer:",
-        //   pointer,
-        //   "memory[pointer]:",
-        //   memory[pointer],
-        //   "char:",
-        //   char,
-        //   "output:",
-        //   output
-        // );
+        console.log(
+          "OOM output / pointer:",
+          pointer,
+          "memory[pointer]:",
+          memory[pointer],
+          "char:",
+          char,
+          "output:",
+          output
+        );
         break;
       case "MOO": // ポインタの指す値が0なら、対応する「moo」にジャンプ
         if (memory[pointer] === 0) {
