@@ -9,6 +9,7 @@ interface Item {
   completed: boolean;
 }
 
+// TODO: レスポンスが治ったらもどす
 interface ItemResponse {
   id: number;
   title: string;
@@ -51,54 +52,81 @@ const App: Component = () => {
     fetchData();
   });
 
-  const addItem = (inputText: string) => {
+  const addItem = async (inputText: string) => {
     setLoading(true);
-    fetch("/todos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: userID,
-        title: inputText,
-        description: inputText,
-        completed: false,
-      }),
-    })
-      .then((response) => {
-        console.log("response:", response);
-        fetchData();
-        setNewItem("");
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setLoading(false);
+    try {
+      const response = await fetch("/todos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: userID,
+          title: inputText,
+          description: inputText,
+          completed: false,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const newItemData = await response.json();
+
+      // ローカル状態を更新（refetchしない）
+      setItems((prev) => [
+        ...prev,
+        {
+          id: newItemData.id,
+          title: newItemData.title,
+          description: newItemData.description.String,
+          completed: newItemData.completed.Bool,
+        },
+      ]);
+      setNewItem("");
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const deleteItem = (id: number) => {
     setItems(items().filter((item) => item.id !== id));
   };
 
-  const toggleItem = (item: Item) => {
+  const toggleItem = async (item: Item) => {
     setLoading(true);
-    fetch(`/todos/${item.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...item,
-        completed: !item.completed,
-      }),
-    })
-      .then(() => {
-        fetchData();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setLoading(false);
+    try {
+      const response = await fetch(`/todos/${item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...item,
+          completed: !item.completed,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // ローカル状態を更新（refetchしない）
+      setItems((prev) =>
+        prev.map((prevItem) =>
+          prevItem.id === item.id
+            ? { ...prevItem, completed: !prevItem.completed }
+            : prevItem
+        )
+      );
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
