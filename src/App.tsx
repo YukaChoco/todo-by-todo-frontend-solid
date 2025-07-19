@@ -1,6 +1,5 @@
 import { createSignal, onMount, type Component } from "solid-js";
 
-import logo from "./logo.svg";
 import styles from "./App.module.css";
 
 interface Item {
@@ -16,17 +15,28 @@ const App: Component = () => {
   const [loading, setLoading] = createSignal<boolean>(false);
   const userID = 2;
 
+  const fetchData = async () => {
+    setLoading(true);
+    // APIからデータを取得し、itemsに追加
+    await fetch("/todos")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("data:", data);
+        setItems([
+          ...data.map((item: Item) => ({
+            id: item.id,
+            title: item.title,
+            description: item.description.String,
+            completed: item.completed.Bool,
+          })),
+        ]);
+        // TODO: レスポンスが治ったらもどす
+        // setItems([...data]);
+      });
+    setLoading(false);
+  };
+
   onMount(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      // APIからデータを取得し、itemsに追加
-      await fetch("/todos")
-        .then((response) => response.json())
-        .then((data) => {
-          setItems([...data]);
-        });
-      setLoading(false);
-    };
     fetchData();
   });
 
@@ -43,21 +53,16 @@ const App: Component = () => {
         description: inputText,
         completed: false,
       }),
-    }).then((response) => {
-      console.log("response:", response);
-      // TODO: refetch
-      setItems((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          title: inputText,
-          description: inputText,
-          completed: false,
-        },
-      ]);
-      setNewItem("");
-      setLoading(false);
-    });
+    })
+      .then((response) => {
+        console.log("response:", response);
+        fetchData();
+        setNewItem("");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setLoading(false);
+      });
   };
 
   const deleteItem = (id: number) => {
