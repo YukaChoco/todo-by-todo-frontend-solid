@@ -65,18 +65,8 @@ export function useTodos() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const newItemData = await response.json();
-
       // ローカル状態を更新（refetchしない）
-      setItems((prev) => [
-        ...prev,
-        {
-          id: newItemData.id,
-          title: newItemData.title,
-          description: newItemData.description.String,
-          completed: newItemData.completed.Bool,
-        },
-      ]);
+      fetchData();
     } catch (error) {
       console.error("Error:", error);
     } finally {
