@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/todos",
+      "destination": "https://todo.mazrean.com/api/todos"
+    }
+  ]
+}
