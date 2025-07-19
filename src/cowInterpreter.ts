@@ -54,8 +54,16 @@ export function runCowInterpreter(code: string, input: string = ""): string {
           "memory[pointer]:",
           memory[pointer]
         );
+        if (pointer >= memory.length) {
+          console.log("pointer overflow");
+          throw new Error("pointer overflow");
+        }
         break;
       case "mOo": // ポインタをデクリメント
+        if (pointer <= 0) {
+          console.log("pointer underflow");
+          throw new Error("pointer underflow");
+        }
         pointer--;
         console.log(
           "mOo pointer decremented / pointer:",

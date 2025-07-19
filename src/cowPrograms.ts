@@ -12,7 +12,10 @@
 // Moo	なし	ポインタの指す値が0なら「oom」、非0ならば「OOM」を実行
 
 // 文字列の入力を受け取って、その文字列を出力するプログラム
-// ,[>,]
+// ,[>,] <[.<]
 export const cowPrograms: string = `
+moO
 oom MOO moO oom moo
+mOo
+MOO OOM mOo moo
 `;
