@@ -92,8 +92,20 @@ const App: Component = () => {
     }
   };
 
-  const deleteItem = (id: number) => {
-    setItems(items().filter((item) => item.id !== id));
+  const deleteItem = (item: Item) => {
+    setLoading(true);
+    fetch(`/todos/${item.id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setItems(items().filter((i) => i.id !== item.id));
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const toggleItem = async (item: Item) => {
@@ -145,7 +157,7 @@ const App: Component = () => {
               <span>{item.title}</span>
               <span> / </span>
               <span>{item.description}</span>
-              <button onClick={() => deleteItem(item.id)}>Delete</button>
+              <button onClick={() => deleteItem(item)}>Delete</button>
             </li>
           ))}
         </ul>
