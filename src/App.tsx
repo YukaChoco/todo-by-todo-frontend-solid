@@ -9,6 +9,17 @@ interface Item {
   completed: boolean;
 }
 
+interface ItemResponse {
+  id: number;
+  title: string;
+  description: {
+    String: string;
+  };
+  completed: {
+    Bool: boolean;
+  };
+}
+
 const App: Component = () => {
   const [items, setItems] = createSignal<Item[]>([]);
   const [newItem, setNewItem] = createSignal<string>("");
@@ -23,7 +34,7 @@ const App: Component = () => {
       .then((data) => {
         console.log("data:", data);
         setItems([
-          ...data.map((item: Item) => ({
+          ...data.map((item: ItemResponse) => ({
             id: item.id,
             title: item.title,
             description: item.description.String,
