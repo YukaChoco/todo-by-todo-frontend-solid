@@ -62,7 +62,6 @@
 }
 
 .taskName {
-  background: #fff9c4;
   border: 2px solid #ddd;
   border-radius: 6px;
   padding: 8px 12px;
@@ -77,7 +76,6 @@
 }
 
 .detailText {
-  background: #f8f9fa;
   border: 2px solid #ddd;
   border-radius: 6px;
   padding: 12px;
