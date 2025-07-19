@@ -1,12 +1,13 @@
 import { onMount, createEffect } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
+import styles from "./HanddrawnTaskCard.module.css";
 
 interface HanddrawnTaskCardProps {
   name: string;
   completed: boolean;
   priority: "high" | "medium" | "low";
-  children?: JSX.Element;
+  children: JSX.Element[];
 }
 
 export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.Element {
@@ -19,10 +20,10 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
       svgRef.innerHTML = "";
       const rc = rough.svg(svgRef);
       // 付箋紙風の四角形
-      const rect = rc.rectangle(2, 2, 340, 54, {
+      const rect = rc.rectangle(2, 2, 146, 146, {
         stroke: "#b59b5b",
         strokeWidth: 2.5,
-        fill: "#fffbe7",
+        fill: "#fff9c4", // 淡い黄色
         fillStyle: "solid",
         roughness: 2.2,
         bowing: 2.5,
@@ -47,7 +48,7 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
       }
       // 手書き風アンダーライン
       const line = rc.linearPath([
-        [20, 18], [320, 18]
+        [15, 14], [135, 14]
       ], {
         stroke: color,
         strokeWidth,
@@ -59,13 +60,20 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
   });
 
   return (
-    <div style={{ position: "relative", width: "344px", height: "58px", margin: "12px 0" }}>
-      <svg ref={el => svgRef = el!} width={344} height={58} style={{ position: "absolute", top: 0, left: 0, 'z-index': 0 }} />
-      <div style={{ position: "relative", 'z-index': 1, padding: "10px 24px 8px 24px", display: "flex", alignItems: "center", gap: "12px" }}>
-        {props.children}
-        <div style={{ flex: 1, 'font-size': "1.1rem", 'text-decoration': props.completed ? "line-through" : "none", color: props.completed ? "#aaa" : "#222" }}>{props.name}</div>
+    <div class={styles.container}>
+      <svg ref={el => svgRef = el!} width={150} height={150} class={styles.backgroundSvg} />
+      {/* チェックボックスを左上に配置 */}
+      <div class={styles.checkbox}>
+        {props.children[0]}
       </div>
-      <svg ref={el => underlineRef = el!} width={344} height={22} style={{ position: "absolute", left: 0, bottom: 0, 'z-index': 2 }} />
+      {/* バツボタンを右上に配置 */}
+      <div class={styles.deleteButton}>
+        {props.children[1]}
+      </div>
+      <div class={styles.content}>
+        <div class={props.completed ? styles.taskNameCompleted : styles.taskNameActive}>{props.name}</div>
+      </div>
+      <svg ref={el => underlineRef = el!} width={150} height={24} class={styles.underlineSvg} />
     </div>
   );
 } 
