@@ -9,14 +9,18 @@
 }
 
 .header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+}
+
+.header ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 
 .link {
@@ -30,4 +34,82 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.fab {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ffb300;
+  color: #222;
+  font-size: 2rem;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  cursor: pointer;
+  z-index: 1900;
+  transition: background 0.2s;
+}
+.fab:hover {
+  background: #ffd54f;
+}
+.fabInputOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.15);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  z-index: 2000;
+  isolation: isolate;
+}
+.fabInputPopup {
+  background: #fffbe7;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 0 24px rgba(0,0,0,0.18);
+  padding: 24px 24px 16px 24px;
+  margin: 0 32px 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  position: relative;
+  z-index: 2001;
+}
+.fabInputPopup input {
+  font-size: 1rem;
+  padding: 8px;
+  border: 1.5px solid #ffb300;
+  border-radius: 8px;
+  outline: none;
+}
+.fabInputPopup button {
+  margin-top: 4px;
+  font-size: 1rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #ffb300;
+  color: #222;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.fabInputPopup button:hover {
+  background: #ffd54f;
+}
+.closeBtn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  color: #222;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  z-index: 9100;
 }

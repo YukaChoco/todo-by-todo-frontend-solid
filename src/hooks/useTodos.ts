@@ -11,12 +11,8 @@ interface Item {
 interface ItemResponse {
   id: number;
   title: string;
-  description: {
-    String: string;
-  };
-  completed: {
-    Bool: boolean;
-  };
+  description: string;
+  completed: boolean;
 }
 
 export function useTodos() {
@@ -32,12 +28,22 @@ export function useTodos() {
       console.log("data:", data);
       setItems([
         ...data
-          .map((item: ItemResponse) => ({
-            id: item.id,
-            title: item.title,
-            description: item.description.String,
-            completed: item.completed.Bool,
-          }))
+          .map((item: ItemResponse) => {
+            console.log("Processing item:", item);
+            console.log("Description structure:", item.description);
+            console.log("Description value:", item.description);
+            
+            // descriptionの安全な取得
+            const description = item.description || "";
+            console.log("Final description:", description);
+            
+            return {
+              id: item.id,
+              title: item.title,
+              description: description,
+              completed: item.completed,
+            };
+          })
           .reverse(), // 配列の順序を逆にして古い順に
       ]);
     } catch (error) {
@@ -47,7 +53,7 @@ export function useTodos() {
     }
   };
 
-  const addItem = async (inputText: string) => {
+  const addItem = async (title: string, description: string = "") => {
     setLoading(true);
     try {
       const response = await fetch("/todos", {
@@ -57,8 +63,8 @@ export function useTodos() {
         },
         body: JSON.stringify({
           user_id: userID,
-          title: inputText,
-          description: inputText,
+          title: title,
+          description: description,
           completed: false,
         }),
       });
