@@ -1,9 +1,11 @@
 import { createSignal, onMount, type Component } from "solid-js";
+import { createStore } from "solid-js/store";
 import rough from "roughjs/bundled/rough.esm.js";
 import HanddrawnTabs from "./components/HanddrawnTabs";
 import HanddrawnSpeechBubble from "./components/HanddrawnSpeechBubble";
 import HanddrawnCheckbox from "./components/HanddrawnCheckbox";
 import HanddrawnIconButton from "./components/HanddrawnIconButton";
+import HanddrawnTaskCard from "./components/HanddrawnTaskCard";
 
 import styles from "./App.module.css";
 
@@ -21,6 +23,8 @@ const App: Component = () => {
   const [error, setError] = createSignal<string>("");
   const [showInput, setShowInput] = createSignal(false);
   let svgRef: SVGSVGElement | undefined;
+  // タスクIDごとのランダム座標を保持
+  const [positions, setPositions] = createStore<Record<number, {top: number, left: number}>>({});
 
   onMount(() => {
     if (svgRef) {
@@ -44,10 +48,20 @@ const App: Component = () => {
       setTimeout(() => setError(""), 3000);
       return;
     }
-    setItems((prev) => [
-      ...prev,
-      { id: prev.length + 1, name: newItem(), completed: false, priority: "medium" }, // 仮でmedium固定
-    ]);
+    setItems((prev) => {
+      const id = prev.length + 1;
+      // 位置を新規生成
+      if (!positions[id]) {
+        setPositions(id, {
+          top: Math.floor(Math.random() * 300),
+          left: Math.floor(Math.random() * 500),
+        });
+      }
+      return [
+        ...prev,
+        { id, name: newItem(), completed: false, priority: "medium" },
+      ];
+    });
     setNewItem("");
   };
 
@@ -85,20 +99,38 @@ const App: Component = () => {
           selected={category()}
           onSelect={setCategory}
         />
-        <header class={styles.header}>
+        <header class={styles.header} style={{ position: "relative", width: "100%", height: "400px" }}>
           <h1>Todo List</h1>
-          <ul>
-            {filteredItems().map((item) => (
-              <li>
-                <HanddrawnCheckbox
-                  checked={item.completed}
-                  onChange={() => toggleItem(item.id)}
-                />
-                <span>{item.name}</span>
-                <HanddrawnIconButton icon="x" onClick={() => deleteItem(item.id)} title="削除" />
-              </li>
-            ))}
-          </ul>
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            {filteredItems().map((item) => {
+              // 既存の位置を参照、なければ初期化
+              let pos = positions[item.id];
+              if (!pos) {
+                pos = {
+                  top: Math.floor(Math.random() * 300),
+                  left: Math.floor(Math.random() * 500),
+                };
+                setPositions(item.id, pos);
+              }
+              return (
+                <div style={{ position: "absolute", top: `${pos.top}px`, left: `${pos.left}px` }}>
+                  <HanddrawnTaskCard
+                    name={item.name}
+                    completed={item.completed}
+                    priority={item.priority}
+                  >
+                    {[
+                      <HanddrawnCheckbox
+                        checked={item.completed}
+                        onChange={() => toggleItem(item.id)}
+                      />,
+                      <HanddrawnIconButton icon="x" onClick={() => deleteItem(item.id)} title="削除" />
+                    ]}
+                  </HanddrawnTaskCard>
+                </div>
+              );
+            })}
+          </div>
         </header>
         {/* フローティングボタンと入力欄 */}
         <HanddrawnIconButton icon="plus" onClick={() => setShowInput(true)} title="追加" size={48} class={styles.fab} />
@@ -112,7 +144,6 @@ const App: Component = () => {
                 placeholder="新しいタスクを入力"
               />
               <button onClick={() => { addItem(); setShowInput(false); }}>追加</button>
-              <HanddrawnIconButton icon="x" onClick={() => setShowInput(false)} title="閉じる" size={32} />
             </div>
           </div>
         )}
