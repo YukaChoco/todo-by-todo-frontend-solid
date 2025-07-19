@@ -479,6 +479,19 @@ const App: Component = () => {
           </div>
         </div>
       )}
+      <canvas
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          "z-index": 0,
+          width: "600px",
+          height: "800px",
+        }}
+        class="zdog-canvas"
+        width="600"
+        height="800"
+      ></canvas>
     </div>
   );
 };
