@@ -1,8 +1,8 @@
-export function runCowInterpreter(code: string, input: string[] = []): string {
+export function runCowInterpreter(code: string, input: string = ""): string {
   const memory: number[] = Array(30000).fill(0);
   let pointer = 0;
   let output: string = "";
-  const inputArray = input;
+  const inputArray = input.split("");
   let inputPointer = 0;
 
   console.log("code:", code);
