@@ -30,7 +30,7 @@ const App: Component = () => {
     ]);
     setNewItem("");
 
-    const result = runCowInterpreter(cowPrograms, "");
+    const result = runCowInterpreter(cowPrograms, ["5", "8"]);
     console.log("Cow Interpreter Output:", result);
     console.log("Cow Interpreter Result length:", result.length);
     console.log(
