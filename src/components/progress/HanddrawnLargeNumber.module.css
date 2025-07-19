@@ -1,0 +1,18 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.svg {
+  cursor: default;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #222;
+  text-align: center;
+} 
