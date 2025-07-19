@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, createEffect } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
 import styles from "./HanddrawnTabs.module.css";
@@ -33,8 +33,12 @@ export default function HanddrawnTabs(props: HanddrawnTabsProps): JSX.Element {
     });
   };
 
-  // 再描画
-  setTimeout(drawTabs, 0);
+  // 選択状態の変更を監視して再描画
+  createEffect(() => {
+    // propsの変更を監視
+    props.selected;
+    setTimeout(drawTabs, 0);
+  });
 
   return (
     <div class={styles.container}>
