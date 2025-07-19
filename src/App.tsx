@@ -1,36 +1,28 @@
-import { createSignal, type Component } from "solid-js";
-
-import logo from "./logo.svg";
+import { createSignal, onMount, type Component } from "solid-js";
+import { useTodos } from "./hooks/useTodos";
 import styles from "./App.module.css";
 
 interface Item {
   id: number;
-  name: string;
+  title: string;
+  description: string;
   completed: boolean;
 }
 
 const App: Component = () => {
-  const [items, setItems] = createSignal<Item[]>([]);
   const [newItem, setNewItem] = createSignal<string>("");
+  const { items, loading, fetchData, addItem, toggleItem, deleteItem } =
+    useTodos();
 
-  const addItem = () => {
-    setItems((prev) => [
-      ...prev,
-      { id: prev.length + 1, name: newItem(), completed: false },
-    ]);
-    setNewItem("");
-  };
+  onMount(() => {
+    fetchData();
+  });
 
-  const deleteItem = (id: number) => {
-    setItems(items().filter((item) => item.id !== id));
-  };
-
-  const toggleItem = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      )
-    );
+  const handleAddItem = async () => {
+    if (newItem().trim()) {
+      await addItem(newItem());
+      setNewItem("");
+    }
   };
 
   return (
@@ -44,10 +36,12 @@ const App: Component = () => {
               <input
                 type="checkbox"
                 checked={item.completed}
-                onChange={() => toggleItem(item.id)}
+                onChange={() => toggleItem(item)}
               />
-              <span>{item.name}</span>
-              <button onClick={() => deleteItem(item.id)}>Delete</button>
+              <span>{item.title}</span>
+              <span> / </span>
+              <span>{item.description}</span>
+              <button onClick={() => deleteItem(item)}>Delete</button>
             </li>
           ))}
         </ul>
@@ -56,7 +50,9 @@ const App: Component = () => {
           value={newItem()}
           onInput={(e) => setNewItem(e.target.value)}
         />
-        <button onClick={addItem}>Add</button>
+        <button onClick={handleAddItem} disabled={loading()}>
+          {loading() ? "Adding..." : "Add"}
+        </button>
       </header>
     </div>
   );
