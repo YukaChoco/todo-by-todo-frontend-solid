@@ -69,12 +69,25 @@ const App: Component = () => {
     setItems(items().filter((item) => item.id !== id));
   };
 
-  const toggleItem = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      )
-    );
+  const toggleItem = (item: Item) => {
+    setLoading(true);
+    fetch(`/todos/${item.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...item,
+        completed: !item.completed,
+      }),
+    })
+      .then(() => {
+        fetchData();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setLoading(false);
+      });
   };
 
   return (
@@ -88,7 +101,7 @@ const App: Component = () => {
               <input
                 type="checkbox"
                 checked={item.completed}
-                onChange={() => toggleItem(item.id)}
+                onChange={() => toggleItem(item)}
               />
               <span>{item.title}</span>
               <span> / </span>
