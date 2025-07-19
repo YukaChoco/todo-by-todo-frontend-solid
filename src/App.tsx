@@ -14,19 +14,18 @@ import HanddrawnProgressDisplay from "./components/progress/HanddrawnProgressDis
 // Animation components
 import DragArrowTrail from "./components/animation/DragArrowTrail";
 import DrawingAnimation from "./components/animation/DrawingAnimation";
-
+import { useTodos } from "./hooks/useTodos";
 import styles from "./App.module.css";
 
 interface Item {
   id: number;
-  name: string;
-  detail: string;
+  title: string;
+  description: string;
   completed: boolean;
   priority: "high" | "medium" | "low";
 }
 
 const App: Component = () => {
-  const [items, setItems] = createSignal<Item[]>([]);
   const [newItem, setNewItem] = createSignal<string>("");
   const [newItemDetail, setNewItemDetail] = createSignal<string>("");
   const [category, setCategory] = createSignal<string>("すべて");
@@ -35,6 +34,13 @@ const App: Component = () => {
   const [showProgress, setShowProgress] = createSignal(true);
   const [selectedTaskId, setSelectedTaskId] = createSignal<number | null>(null);
   let svgRef: SVGSVGElement | undefined;
+  
+  // useTodosフックから基本的なCRUD操作を取得
+  const { items: baseItems, loading, fetchData, addItem: baseAddItem, toggleItem: baseToggleItem, deleteItem: baseDeleteItem } = useTodos();
+  
+  // 基本アイテムをpriority付きアイテムに変換（拡張）
+  const items = () => baseItems().map(item => ({ ...item, priority: "medium" as const }));
+  
   // タスクIDごとのランダム座標を保持
   const [positions, setPositions] = createStore<Record<number, {top: number, left: number}>>({});
   // ドラッグ&ドロップ状態
@@ -65,26 +71,27 @@ const App: Component = () => {
       });
       svgRef.appendChild(node);
     }
+    fetchData();
   });
 
-  const addItem = () => {
+  const addItem = async () => {
     if (!newItem().trim()) {
       setError("タスク名を入力してください");
       setTimeout(() => setError(""), 3000);
       return;
     }
     
+    // アニメーションの準備
     const id = items().length + 1;
-    // 位置を新規生成（タブ領域を除外）
     const newPosition = {
-      top: Math.floor(Math.random() * 500), // タブ領域下から配置
+      top: Math.floor(Math.random() * 500),
       left: Math.floor(Math.random() * 400),
     };
     setPositions(id, newPosition);
     
     // アニメーションを開始
     const rect = document.querySelector('.main-container')?.getBoundingClientRect();
-    const targetX = (rect?.left || 0) + newPosition.left + 75; // カードの中心
+    const targetX = (rect?.left || 0) + newPosition.left + 75;
     const targetY = (rect?.top || 0) + newPosition.top + 75;
     
     setAnimationState({
@@ -92,27 +99,29 @@ const App: Component = () => {
       targetPosition: { x: targetX, y: targetY }
     });
     
-    // アイテムを追加（少し遅延）
+    // APIを通じてアイテムを追加
+    await baseAddItem(newItem());
+    setNewItem("");
+    setNewItemDetail("");
+    
+    // アニメーション終了
     setTimeout(() => {
-      setItems((prev) => [
-        ...prev,
-        { id, name: newItem(), detail: newItemDetail(), completed: false, priority: "medium" },
-      ]);
-      setNewItem("");
-      setNewItemDetail("");
+      setAnimationState(prev => ({ ...prev, isActive: false }));
     }, 400);
   };
 
-  const deleteItem = (id: number) => {
-    setItems(items().filter((item) => item.id !== id));
+  const toggleItem = async (id: number) => {
+    const item = baseItems().find(item => item.id === id);
+    if (item) {
+      await baseToggleItem(item);
+    }
   };
 
-  const toggleItem = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      )
-    );
+  const deleteItem = async (id: number) => {
+    const item = baseItems().find(item => item.id === id);
+    if (item) {
+      await baseDeleteItem(item);
+    }
   };
 
   // カテゴリでフィルタリング
@@ -169,7 +178,7 @@ const App: Component = () => {
         const newTop = e.clientY - containerRect.top - offsetY;
         
         setPositions(taskId, {
-          top: Math.max(0, Math.min(500, newTop)), // タブ領域下に制限
+          top: Math.max(0, Math.min(500, newTop)),
           left: Math.max(0, Math.min(400, newLeft))
         });
       };
@@ -262,7 +271,7 @@ const App: Component = () => {
               let pos = positions[item.id];
               if (!pos) {
                 pos = {
-                  top: Math.floor(Math.random() * 500), // タブ領域下から配置
+                  top: Math.floor(Math.random() * 500),
                   left: Math.floor(Math.random() * 400),
                 };
                 setPositions(item.id, pos);
@@ -273,7 +282,7 @@ const App: Component = () => {
                   style={{ position: "absolute", top: `${pos.top}px`, left: `${pos.left}px`, "z-index": item.id }}
                 >
                   <HanddrawnTaskCard
-                    name={item.name}
+                    name={item.title}
                     completed={item.completed}
                     priority={item.priority}
                     onDragStart={(e) => handleDragStart(item.id, e)}
@@ -314,8 +323,8 @@ const App: Component = () => {
       {selectedTask() && (
         <HanddrawnTaskDetail
           id={selectedTask()!.id}
-          name={selectedTask()!.name}
-          detail={selectedTask()!.detail}
+          name={selectedTask()!.title}
+          detail={selectedTask()!.description}
           completed={selectedTask()!.completed}
           priority={selectedTask()!.priority}
           onClose={() => setSelectedTaskId(null)}
@@ -365,7 +374,9 @@ const App: Component = () => {
             <div style={{ "margin-top": "8px", "font-size": "12px", color: "#666" }}>
               Cmd+Enter で追加
             </div>
-            <button onClick={() => { addItem(); setShowInput(false); }}>追加</button>
+            <button onClick={() => { addItem(); setShowInput(false); }} disabled={loading()}>
+              {loading() ? "追加中..." : "追加"}
+            </button>
           </div>
         </div>
       )}
