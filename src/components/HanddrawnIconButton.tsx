@@ -1,6 +1,7 @@
 import { createEffect, onCleanup } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
+import styles from "./HanddrawnIconButton.module.css";
 
 interface HanddrawnIconButtonProps {
   icon: "x" | "plus";
@@ -62,17 +63,7 @@ export default function HanddrawnIconButton(props: HanddrawnIconButtonProps): JS
   return (
     <button
       type="button"
-      class={props.class}
-      style={{
-        background: "none",
-        border: "none",
-        padding: 0,
-        margin: 0,
-        cursor: props.disabled ? "not-allowed" : "pointer",
-        outline: "none",
-        'vertical-align': "middle",
-        display: "inline-block",
-      }}
+      class={`${props.disabled ? styles.buttonDisabled : styles.buttonEnabled} ${props.class || ''}`}
       onClick={() => !props.disabled && props.onClick()}
       disabled={props.disabled}
       title={props.title}
@@ -82,7 +73,7 @@ export default function HanddrawnIconButton(props: HanddrawnIconButtonProps): JS
         ref={el => (svgRef = el)}
         width={size}
         height={size}
-        style={{ display: "block" }}
+        class={styles.svg}
       />
     </button>
   );

@@ -1,6 +1,7 @@
 import { Show, onMount } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
+import styles from "./HanddrawnSpeechBubble.module.css";
 
 interface HanddrawnSpeechBubbleProps {
   message: string;
@@ -43,42 +44,14 @@ export default function HanddrawnSpeechBubble(props: HanddrawnSpeechBubbleProps)
 
   return (
     <Show when={props.visible}>
-      <div style={{
-        position: "absolute",
-        top: "40px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        'z-index': 10,
-        'pointer-events': "auto",
-      }}>
-        <svg ref={el => (svgRef = el!)} width={300} height={100} style={{ display: "block" }} />
-        <div style={{
-          position: "absolute",
-          top: "30px",
-          left: 0,
-          width: "100%",
-          'text-align': "center",
-          color: "#e74c3c",
-          'font-weight': "bold",
-          'font-size': "1.1rem",
-          'pointer-events': "none",
-        }}>
+      <div class={styles.container}>
+        <svg ref={el => (svgRef = el!)} width={300} height={100} class={styles.svg} />
+        <div class={styles.message}>
           {props.message}
         </div>
         {props.onClose && (
           <button
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "16px",
-              background: "none",
-              border: "none",
-              color: "#e74c3c",
-              'font-weight': "bold",
-              'font-size': "1.2rem",
-              cursor: "pointer",
-              'pointer-events': "auto",
-            }}
+            class={styles.closeButton}
             onClick={props.onClose}
             aria-label="閉じる"
           >×</button>

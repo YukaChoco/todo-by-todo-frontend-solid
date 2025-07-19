@@ -1,6 +1,7 @@
 import { For } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
+import styles from "./HanddrawnTabs.module.css";
 
 interface HanddrawnTabsProps {
   tabs: string[];
@@ -36,27 +37,17 @@ export default function HanddrawnTabs(props: HanddrawnTabsProps): JSX.Element {
   setTimeout(drawTabs, 0);
 
   return (
-    <div style={{ display: "flex", gap: "16px", 'margin-bottom': "24px" }}>
+    <div class={styles.container}>
       <For each={props.tabs}>{(tab, i) => (
-        <div style={{ position: "relative", cursor: "pointer" }} onClick={() => props.onSelect(tab)}>
+        <div class={styles.tab} onClick={() => props.onSelect(tab)}>
           <svg
             ref={el => (svgRefs[i()] = el)}
             width={102}
             height={42}
-            style={{ display: "block" }}
+            class={styles.svg}
           />
           <span
-            style={{
-              position: "absolute",
-              top: "8px",
-              left: "0",
-              width: "100%",
-              'text-align': "center",
-              color: props.selected === tab ? "#e67e22" : "#222",
-              'font-size': "1.1rem",
-              'letter-spacing': "0.05em",
-              'user-select': "none",
-            }}
+            class={props.selected === tab ? styles.labelSelected : styles.labelUnselected}
           >
             {tab}
           </span>

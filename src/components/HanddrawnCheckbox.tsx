@@ -1,6 +1,7 @@
 import { createEffect, onCleanup } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import rough from "roughjs/bundled/rough.esm.js";
+import styles from "./HanddrawnCheckbox.module.css";
 
 interface HanddrawnCheckboxProps {
   checked: boolean;
@@ -47,7 +48,8 @@ export default function HanddrawnCheckbox(props: HanddrawnCheckboxProps): JSX.El
   onCleanup(() => { if (svgRef) svgRef.innerHTML = ""; });
 
   return (
-    <span style={{ display: "inline-block", cursor: props.disabled ? "not-allowed" : "pointer", 'vertical-align': "middle" }}
+    <span 
+      class={props.disabled ? styles.containerDisabled : styles.containerEnabled}
       onClick={() => !props.disabled && props.onChange()}
       tabIndex={props.disabled ? -1 : 0}
       aria-checked={props.checked}
@@ -57,7 +59,7 @@ export default function HanddrawnCheckbox(props: HanddrawnCheckboxProps): JSX.El
         ref={el => (svgRef = el)}
         width={size}
         height={size}
-        style={{ display: "block" }}
+        class={styles.svg}
       />
     </span>
   );

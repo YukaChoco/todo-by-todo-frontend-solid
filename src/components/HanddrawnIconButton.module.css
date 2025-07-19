@@ -1,0 +1,23 @@
+.button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.buttonEnabled {
+  composes: button;
+  cursor: pointer;
+}
+
+.buttonDisabled {
+  composes: button;
+  cursor: not-allowed;
+}
+
+.svg {
+  display: block;
+} 

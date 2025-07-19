@@ -1,0 +1,18 @@
+.container {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.containerEnabled {
+  composes: container;
+  cursor: pointer;
+}
+
+.containerDisabled {
+  composes: container;
+  cursor: not-allowed;
+}
+
+.svg {
+  display: block;
+} 
