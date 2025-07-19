@@ -2,7 +2,11 @@
   "rewrites": [
     {
       "source": "/todos",
-      "destination": "https://todo.mazrean.com/api/todos"
+      "destination": "/api/todos"
+    },
+    {
+      "source": "/todos/([0-9]+)",
+      "destination": "/api/todos/$1"
     }
   ]
 }
