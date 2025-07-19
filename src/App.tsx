@@ -22,7 +22,6 @@ interface Item {
   title: string;
   description: string;
   completed: boolean;
-  priority: "high" | "medium" | "low";
 }
 
 const App: Component = () => {
@@ -38,8 +37,8 @@ const App: Component = () => {
   // useTodosフックから基本的なCRUD操作を取得
   const { items: baseItems, loading, fetchData, addItem: baseAddItem, toggleItem: baseToggleItem, deleteItem: baseDeleteItem } = useTodos();
   
-  // 基本アイテムをpriority付きアイテムに変換（拡張）
-  const items = () => baseItems().map(item => ({ ...item, priority: "medium" as const }));
+  // 基本アイテムをそのまま使用（priorityフィールドを削除）
+  const items = () => baseItems();
   
   // タスクIDごとのランダム座標を保持
   const [positions, setPositions] = createStore<Record<number, {top: number, left: number}>>({});
@@ -99,8 +98,8 @@ const App: Component = () => {
       targetPosition: { x: targetX, y: targetY }
     });
     
-    // APIを通じてアイテムを追加
-    await baseAddItem(newItem());
+    // APIを通じてアイテムを追加（titleとdescriptionを分けて送信）
+    await baseAddItem(newItem(), newItemDetail());
     setNewItem("");
     setNewItemDetail("");
     
@@ -138,7 +137,12 @@ const App: Component = () => {
   // 選択されたタスクを動的に取得（リアクティブ）
   const selectedTask = () => {
     const taskId = selectedTaskId();
-    return taskId ? items().find(item => item.id === taskId) || null : null;
+    const task = taskId ? items().find(item => item.id === taskId) || null : null;
+    if (task) {
+      console.log("Selected task:", task);
+      console.log("Task description:", task.description);
+    }
+    return task;
   };
 
   // ドラッグ&ドロップハンドラー
@@ -284,7 +288,7 @@ const App: Component = () => {
                   <HanddrawnTaskCard
                     name={item.title}
                     completed={item.completed}
-                    priority={item.priority}
+                    priority="medium"
                     onDragStart={(e) => handleDragStart(item.id, e)}
                     onDragEnd={handleDragEnd}
                     onClick={() => setSelectedTaskId(item.id)}
@@ -326,7 +330,7 @@ const App: Component = () => {
           name={selectedTask()!.title}
           detail={selectedTask()!.description}
           completed={selectedTask()!.completed}
-          priority={selectedTask()!.priority}
+          priority="medium"
           onClose={() => setSelectedTaskId(null)}
         />
       )}
