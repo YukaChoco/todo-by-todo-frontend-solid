@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "roughjs": "^4.6.6",
-    "solid-js": "^1.9.5"
+    "solid-js": "^1.9.5",
+    "zdog": "^1.1.3"
   }
 }
