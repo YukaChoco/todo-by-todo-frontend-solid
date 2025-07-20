@@ -490,13 +490,14 @@ const App: Component = () => {
           display: "flex",
           "justify-content": "center",
           "align-items": "center",
-          "z-index": 1000,
+          "z-index": 500,
         }}
       >
         <div
           style={{
             width: "400px",
             height: "600px",
+            position: "relative",
             background:
               "radial-gradient(circle, rgba(224, 0, 50, 1) 0%, rgba(253, 2, 52, 1) 78%, rgba(214, 1, 51, 1) 100%)",
             "box-shadow": "0 0 10px 0 rgba(0, 0, 0, 0.1)",
@@ -508,9 +509,191 @@ const App: Component = () => {
         >
           <div
             style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: "100%",
+              transform: "translate(-50%, -200px)",
+              "text-align": "center",
+              color: "white",
+              "font-weight": "bold",
+              "font-size": "24px",
+              "z-index": 1000,
+              display: "flex",
+              "flex-direction": "column",
+              "align-items": "center",
+              "justify-content": "center",
+              "line-height": "1",
+              "pointer-events": "none",
+            }}
+          >
+            <span
+              style={{
+                "font-size": "32px",
+                color: "#000",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "12px",
+                "-webkit-text-stroke-color": "#000",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              ToDo
+            </span>
+            <span
+              style={{
+                "font-size": "48px",
+                color: "black",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "20px",
+                "-webkit-text-stroke-color": "black",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              スクラッチ
+            </span>
+            <span
+              style={{
+                "font-size": "40px",
+                color: "#000",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "12px",
+                "-webkit-text-stroke-color": "#000",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              くじ
+            </span>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: "100%",
+              transform: "translate(-50%, -200px)",
+              "text-align": "center",
+              color: "white",
+              "font-weight": "bold",
+              "font-size": "24px",
+              "z-index": 1000,
+              display: "flex",
+              "flex-direction": "column",
+              "align-items": "center",
+              "justify-content": "center",
+              "line-height": "1",
+              "pointer-events": "none",
+            }}
+          >
+            <span
+              style={{
+                "font-size": "32px",
+                color: "#fff",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "10px",
+                "-webkit-text-stroke-color": "#fff",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              ToDo
+            </span>
+            <span
+              style={{
+                "font-size": "48px",
+                color: "black",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "20px",
+                "-webkit-text-stroke-color": "black",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              スクラッチ
+            </span>
+            <span
+              style={{
+                "font-size": "40px",
+                color: "#fff",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "10px",
+                "-webkit-text-stroke-color": "#fff",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              くじ
+            </span>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: "100%",
+              transform: "translate(-50%, -200px)",
+              "text-align": "center",
+              color: "white",
+              "font-weight": "bold",
+              "font-size": "24px",
+              "z-index": 1000,
+              display: "flex",
+              "flex-direction": "column",
+              "align-items": "center",
+              "justify-content": "center",
+              "line-height": "1",
+              "pointer-events": "none",
+            }}
+          >
+            <span
+              style={{
+                "font-size": "32px",
+                color: "red",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "2px",
+                "-webkit-text-stroke-color": "red",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              ToDo
+            </span>
+            <span
+              style={{
+                "font-size": "48px",
+                color: "white",
+                "-webkit-text-stroke-width": "3px",
+                "-webkit-text-stroke-color": "white",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              スクラッチ
+            </span>
+            <span
+              style={{
+                "font-size": "40px",
+                color: "red",
+                "font-weight": "bold",
+                "-webkit-text-stroke-width": "2px",
+                "-webkit-text-stroke-color": "red",
+                "font-family": "NotoSansJP",
+              }}
+            >
+              くじ
+            </span>
+          </div>
+          <div
+            style={{
               width: "300px",
               height: "300px",
               position: "relative",
+              "clip-path": `
+                polygon(
+                  50% 0%,  57% 15%,  70% 0%,  76% 18%,
+                  92% 8%,  85% 26%, 100% 30%, 88% 42%,
+                  100% 50%, 88% 58%, 100% 70%, 85% 74%,
+                  92% 92%, 76% 82%, 70% 100%, 57% 85%,
+                  50% 100%, 43% 85%, 30% 100%, 24% 82%,
+                  8% 92%, 15% 74%, 0% 70%, 12% 58%,
+                  0% 50%, 12% 42%, 0% 30%, 15% 26%,
+                  8% 8%, 24% 18%, 30% 0%, 43% 15%
+                )
+              `,
             }}
           >
             <ScratchToReveal
@@ -527,7 +710,7 @@ const App: Component = () => {
                   display: "flex",
                   "justify-content": "center",
                   "align-items": "center",
-                  "font-size": "96px",
+                  "font-size": "60px",
                   background: "white",
                 }}
               >
