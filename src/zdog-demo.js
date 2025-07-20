@@ -377,10 +377,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function animate() {
     var time = Date.now() * 0.001;
 
-    // ハリネズミを画面全面で走り回らせる
+    // ハリネズミを縦横移動のみで走り回らせる
     hedgehog.translate.x = Math.sin(time * 1.5) * 300; // 左右の動き（画面幅全体）
     hedgehog.translate.y = Math.cos(time * 1.2) * 200; // 上下の動き（画面高さ全体）
-    hedgehog.translate.z = Math.sin(time * 0.8) * 50; // 奥行きの動き
+    // z軸の動きを削除して奥行きは固定
+    hedgehog.translate.z = 0;
+    // 向きの揺らぎを復活
     hedgehog.rotate.y = Math.sin(time * 2) * 0.5; // 体の傾き
     hedgehog.rotate.z = Math.sin(time * 1.8) * 0.3; // 体の回転
 

@@ -484,7 +484,8 @@ const App: Component = () => {
           position: "fixed",
           top: 0,
           left: 0,
-          "z-index": 10,
+          "z-index": 1,
+          "pointer-events": "none",
         }}
         width={window.innerWidth}
         height={window.innerHeight}
