@@ -3,8 +3,9 @@ import CubeScene from "./components/cube/CubeScene";
 
 const App: Component = () => {
   return (
-    <div>
+    <div style={{ width: "100vw", height: "100vh" }}>
       <CubeScene />
+
       <canvas
         style={{
           position: "fixed",

@@ -22,11 +22,12 @@ interface ItemResponse {
 export function useTodosFace() {
   const [allItems, setAllItems] = createSignal<Item[]>([]);
   const [loading, setLoading] = createSignal<boolean>(false);
+  const [showScratchCard, setShowScratchCard] = createSignal<boolean>(false);
   const userID = 2;
 
   // 特定の面のアイテムを取得
   const getItemsByFace = (faceId: number) => {
-    return allItems().filter(item => item.faceId === faceId);
+    return allItems().filter((item) => item.faceId === faceId);
   };
 
   const fetchData = async () => {
@@ -34,7 +35,7 @@ export function useTodosFace() {
     try {
       const response = await fetch("/todos");
       const data = await response.json();
-      
+
       setAllItems(
         data
           .map((item: ItemResponse) => {
@@ -126,6 +127,10 @@ export function useTodosFace() {
       console.error("Error:", error);
     } finally {
       setLoading(false);
+
+      if (!item.completed) {
+        setShowScratchCard(true);
+      }
     }
   };
 
@@ -156,5 +161,7 @@ export function useTodosFace() {
     addItem,
     toggleItem,
     deleteItem,
+    showScratchCard,
+    setShowScratchCard,
   };
-} 
+}
