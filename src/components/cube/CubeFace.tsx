@@ -85,11 +85,6 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
 
   // タスクカードのドラッグ処理
   const handleDragStart = (itemId: number, e: MouseEvent) => {
-    // Cmdキー（Mac）またはCtrlキー（Windows）が押されている場合のみドラッグを開始
-    if (!(e.metaKey || e.ctrlKey)) {
-      return;
-    }
-    
     e.preventDefault();
     e.stopPropagation();
     
@@ -122,8 +117,9 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
       const newTop = e.clientY - containerRect.top - dragOffset().y;
       
       // 境界チェック（containerの範囲内に制限）
-      const boundedLeft = Math.max(0, Math.min(newLeft, 410)); // 410px = 600 - 150 - 40 (カード幅とマージン)
-      const boundedTop = Math.max(0, Math.min(newTop, 200)); // 200px = mainContainer高さ - カード高さ
+      // カードサイズ150px、マージン20px、ページ番号エリアを考慮
+      const boundedLeft = Math.max(20, Math.min(newLeft, 410)); // 410px = 600 - 150 - 40 (ページ番号エリアを避ける)
+      const boundedTop = Math.max(0, Math.min(newTop, 280)); // 280px = 450 - 150 - 20 (ページ番号エリアを避ける)
       
       setPosition(draggedItemId, { left: boundedLeft, top: boundedTop });
     }
@@ -174,7 +170,7 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
             
             return (
               <div
-                class={styles.taskCardWrapper}
+                class={`${styles.taskCardWrapper} task-card-wrapper`}
                 style={{
                   position: "absolute",
                   top: `${position().top}px`,
