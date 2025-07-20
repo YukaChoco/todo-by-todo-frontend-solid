@@ -480,9 +480,65 @@ const App: Component = () => {
           </div>
         </div>
       )}
-      <ScratchToReveal width={300} height={300} minScratchPercentage={50}>
-        Scratch To Reveal
-      </ScratchToReveal>
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          display: "flex",
+          "justify-content": "center",
+          "align-items": "center",
+          "z-index": 1000,
+        }}
+      >
+        <div
+          style={{
+            width: "400px",
+            height: "600px",
+            background:
+              "radial-gradient(circle, rgba(224, 0, 50, 1) 0%, rgba(253, 2, 52, 1) 78%, rgba(214, 1, 51, 1) 100%)",
+            "box-shadow": "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+            display: "flex",
+            "justify-content": "center",
+            "align-items": "center",
+            "border-radius": "12px",
+          }}
+        >
+          <div
+            style={{
+              width: "300px",
+              height: "300px",
+              position: "relative",
+            }}
+          >
+            <ScratchToReveal
+              width={300}
+              height={300}
+              minScratchPercentage={30}
+              gradientColors={["#B8B8B8", "#E1DEE2", "#B8B8B8"]}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  "justify-content": "center",
+                  "align-items": "center",
+                  "font-size": "96px",
+                  background: "white",
+                }}
+              >
+                2等
+                <br />
+                あたり
+              </div>
+            </ScratchToReveal>
+          </div>
+        </div>
+      </div>
       <canvas
         style={{
           position: "fixed",
