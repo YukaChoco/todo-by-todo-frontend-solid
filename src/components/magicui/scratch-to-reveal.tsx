@@ -133,7 +133,7 @@ export const ScratchToReveal: Component<ScratchToRevealProps> = (props) => {
         if (props.onComplete) {
           props.onComplete();
         }
-      }, 500);
+      }, 1500);
     }
   };
 

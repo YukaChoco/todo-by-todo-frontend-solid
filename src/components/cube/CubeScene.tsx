@@ -2,7 +2,10 @@ import { onMount, onCleanup, createSignal, createEffect, For } from "solid-js";
 import { render } from "solid-js/web";
 import { JSX } from "solid-js/jsx-runtime";
 import * as THREE from "three";
-import { CSS3DRenderer, CSS3DObject } from "three/examples/jsm/renderers/CSS3DRenderer.js";
+import {
+  CSS3DRenderer,
+  CSS3DObject,
+} from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import CubeFace from "./CubeFace";
 import { useTodosFace } from "../../hooks/useTodosFace";
 import HanddrawnProgressDisplay from "../progress/HanddrawnProgressDisplay";
@@ -10,6 +13,7 @@ import HanddrawnTaskDetail from "../task/HanddrawnTaskDetail";
 import { runCowInterpreter } from "../../cowInterpreter";
 import { cowPrograms } from "../../cowPrograms";
 import styles from "./CubeScene.module.css";
+import { ScratchToReveal } from "../magicui/scratch-to-reveal";
 
 export default function CubeScene(): JSX.Element {
   let containerRef: HTMLDivElement | undefined;
@@ -18,12 +22,12 @@ export default function CubeScene(): JSX.Element {
   let camera: THREE.PerspectiveCamera;
   let cube: THREE.Group;
   let faceElements: HTMLDivElement[] = [];
-  
+
   const [isRotating, setIsRotating] = createSignal(false);
   const [showProgress, setShowProgress] = createSignal(true);
   const [selectedTaskId, setSelectedTaskId] = createSignal<number | null>(null);
   const [currentPage, setCurrentPage] = createSignal<number>(0); // 現在表示中のページ
-  
+
   // フローティングボタン用の状態
   const [showInput, setShowInput] = createSignal(false);
   const [newItem, setNewItem] = createSignal<string>("");
@@ -40,17 +44,20 @@ export default function CubeScene(): JSX.Element {
     addItem,
     toggleItem,
     deleteItem,
+    showScratchCard,
+    setShowScratchCard,
   } = useTodosFace();
 
   // 進捗計算（全体）
   const totalTasks = () => allItems().length;
-  const completedTasks = () => allItems().filter((item) => item.completed).length;
+  const completedTasks = () =>
+    allItems().filter((item) => item.completed).length;
 
   // ページごとの進捗計算
   const getPageProgress = (pageId: number) => {
     const pageItems = getItemsByFace(pageId);
     const total = pageItems.length;
-    const completed = pageItems.filter(item => item.completed).length;
+    const completed = pageItems.filter((item) => item.completed).length;
     return { total, completed };
   };
 
@@ -60,50 +67,54 @@ export default function CubeScene(): JSX.Element {
   // 選択されたタスクを取得
   const selectedTask = () => {
     const taskId = selectedTaskId();
-    return taskId ? allItems().find((item) => item.id === taskId) || null : null;
+    return taskId
+      ? allItems().find((item) => item.id === taskId) || null
+      : null;
   };
 
   // 立方体を特定のページに回転させる
   const rotateCubeToPage = (pageId: number) => {
     if (!cube) return;
-    
+
     setIsRotating(true);
     const targetRotations = [
-      { x: 0, y: 0 },                    // 前面 (ページ1)
-      { x: 0, y: -Math.PI / 2 },         // 右面 (ページ2)
-      { x: 0, y: Math.PI },              // 後面 (ページ3)
-      { x: 0, y: Math.PI / 2 },          // 左面 (ページ4)
-      { x: Math.PI / 2, y: Math.PI },    // 上面 (ページ5) - X軸回転の符号を修正
-      { x: -Math.PI / 2, y: Math.PI },   // 下面 (ページ6) - X軸回転の符号を修正
+      { x: 0, y: 0 }, // 前面 (ページ1)
+      { x: 0, y: -Math.PI / 2 }, // 右面 (ページ2)
+      { x: 0, y: Math.PI }, // 後面 (ページ3)
+      { x: 0, y: Math.PI / 2 }, // 左面 (ページ4)
+      { x: Math.PI / 2, y: Math.PI }, // 上面 (ページ5) - X軸回転の符号を修正
+      { x: -Math.PI / 2, y: Math.PI }, // 下面 (ページ6) - X軸回転の符号を修正
     ];
-    
+
     const target = targetRotations[pageId];
     if (target) {
       // アニメーション付きで回転
       const startRotation = { x: cube.rotation.x, y: cube.rotation.y };
       const duration = 800; // ms
       const startTime = Date.now();
-      
+
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // イージング関数（ease-out）
         const easeOut = 1 - Math.pow(1 - progress, 3);
-        
-        cube.rotation.x = startRotation.x + (target.x - startRotation.x) * easeOut;
-        cube.rotation.y = startRotation.y + (target.y - startRotation.y) * easeOut;
-        
+
+        cube.rotation.x =
+          startRotation.x + (target.x - startRotation.x) * easeOut;
+        cube.rotation.y =
+          startRotation.y + (target.y - startRotation.y) * easeOut;
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
           setIsRotating(false);
         }
       };
-      
+
       animate();
     }
-    
+
     setCurrentPage(pageId);
   };
 
@@ -135,14 +146,16 @@ export default function CubeScene(): JSX.Element {
 
     // APIを通じてアイテムを追加（ページは自動判定）
     await addItem(newItem(), newItemDetail());
-    
+
     // 計算したページに移動とメッセージ表示
-    setAddTaskMessage(`タスクをページ${faceLabels[calculatedPage]}に追加しました`);
+    setAddTaskMessage(
+      `タスクをページ${faceLabels[calculatedPage]}に追加しました`
+    );
     setTimeout(() => setAddTaskMessage(""), 3000);
-    
+
     // そのページに移動
     rotateCubeToPage(calculatedPage);
-    
+
     // フォームをリセット
     setNewItem("");
     setNewItemDetail("");
@@ -161,14 +174,12 @@ export default function CubeScene(): JSX.Element {
   // 立方体の面のラベル
   const faceLabels = [
     "1", // 前面
-    "2", // 右面  
+    "2", // 右面
     "3", // 後面
     "4", // 左面
     "5", // 上面
     "6", // 下面
   ];
-
-
 
   onMount(() => {
     if (!containerRef) return;
@@ -216,12 +227,14 @@ export default function CubeScene(): JSX.Element {
     const handleMouseDown = (event: MouseEvent) => {
       // タスクカード要素をクリックしている場合は立方体の回転を無効にする
       const target = event.target as HTMLElement;
-      const isTaskCard = target.closest('.task-card-wrapper') || target.closest('[class*="HanddrawnTaskCard"]');
-      
+      const isTaskCard =
+        target.closest(".task-card-wrapper") ||
+        target.closest('[class*="HanddrawnTaskCard"]');
+
       if (isRotating() || isTaskCard) return;
       isDragging = true;
       previousMousePosition = { x: event.clientX, y: event.clientY };
-      renderer.domElement.style.cursor = 'grabbing';
+      renderer.domElement.style.cursor = "grabbing";
     };
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -229,34 +242,37 @@ export default function CubeScene(): JSX.Element {
 
       const deltaX = event.clientX - previousMousePosition.x;
       const deltaY = event.clientY - previousMousePosition.y;
-      
+
       // ドラッグの感度を調整
       const sensitivity = 0.005;
-      
+
       // Y軸回転（水平ドラッグ）
       cube.rotation.y += deltaX * sensitivity;
-      
+
       // X軸回転（垂直ドラッグ）
       cube.rotation.x += deltaY * sensitivity;
-      
+
       // X軸回転を制限（立方体が完全に上下逆さまにならないように）
-      cube.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cube.rotation.x));
+      cube.rotation.x = Math.max(
+        -Math.PI / 2,
+        Math.min(Math.PI / 2, cube.rotation.x)
+      );
 
       previousMousePosition = { x: event.clientX, y: event.clientY };
     };
 
     const handleMouseUp = () => {
       isDragging = false;
-      renderer.domElement.style.cursor = 'grab';
+      renderer.domElement.style.cursor = "grab";
     };
 
     // マウスイベントをrenderer.domElementに追加
     renderer.domElement.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-    
+
     // 初期カーソルスタイル
-    renderer.domElement.style.cursor = 'grab';
+    renderer.domElement.style.cursor = "grab";
 
     onCleanup(() => {
       window.removeEventListener("resize", handleResize);
@@ -275,21 +291,21 @@ export default function CubeScene(): JSX.Element {
     const faceSize = 600;
     const halfSize = faceSize / 2;
     const positions = [
-      [0, 0, halfSize],        // 前面
-      [halfSize, 0, 0],        // 右面
-      [0, 0, -halfSize],       // 後面
-      [-halfSize, 0, 0],       // 左面
-      [0, halfSize, 0],        // 上面
-      [0, -halfSize, 0],       // 下面
+      [0, 0, halfSize], // 前面
+      [halfSize, 0, 0], // 右面
+      [0, 0, -halfSize], // 後面
+      [-halfSize, 0, 0], // 左面
+      [0, halfSize, 0], // 上面
+      [0, -halfSize, 0], // 下面
     ];
 
     const rotations = [
-      [0, 0, 0],                   // 前面
-      [0, Math.PI / 2, 0],         // 右面
-      [0, Math.PI, 0],             // 後面
-      [0, -Math.PI / 2, 0],        // 左面
-      [Math.PI / 2, 0, 0],         // 上面
-      [-Math.PI / 2, 0, 0],        // 下面
+      [0, 0, 0], // 前面
+      [0, Math.PI / 2, 0], // 右面
+      [0, Math.PI, 0], // 後面
+      [0, -Math.PI / 2, 0], // 左面
+      [Math.PI / 2, 0, 0], // 上面
+      [-Math.PI / 2, 0, 0], // 下面
     ];
 
     positions.forEach((position, index) => {
@@ -300,34 +316,40 @@ export default function CubeScene(): JSX.Element {
       element.id = `cube-face-${index}`;
 
       // SolidJSコンポーネントをマウント
-      render(() => (
-        <CubeFace
-          faceId={index}
-          faceLabel={faceLabels[index]}
-          items={getItemsByFace(index)}
-          loading={loading()}
-          onToggleItem={toggleItem}
-          onDeleteItem={deleteItem}
-          onTaskClick={handleTaskClick}
-        />
-      ), element);
+      render(
+        () => (
+          <CubeFace
+            faceId={index}
+            faceLabel={faceLabels[index]}
+            items={getItemsByFace(index)}
+            loading={loading()}
+            onToggleItem={toggleItem}
+            onDeleteItem={deleteItem}
+            onTaskClick={handleTaskClick}
+          />
+        ),
+        element
+      );
 
       // CSS3Dオブジェクトの作成
       const object = new CSS3DObject(element);
       object.position.set(position[0], position[1], position[2]);
-      object.rotation.set(rotations[index][0], rotations[index][1], rotations[index][2]);
-      
+      object.rotation.set(
+        rotations[index][0],
+        rotations[index][1],
+        rotations[index][2]
+      );
+
       // 上面と下面の左右反転を修正
-      if (index === 4 || index === 5) { // 上面(4)と下面(5)
+      if (index === 4 || index === 5) {
+        // 上面(4)と下面(5)
         object.scale.set(-1, 1, 1); // X軸方向を反転
       }
-      
+
       cube.add(object);
       faceElements[index] = element;
     });
   };
-
-
 
   const animate = () => {
     requestAnimationFrame(animate);
@@ -337,7 +359,7 @@ export default function CubeScene(): JSX.Element {
   return (
     <div class={styles.cubeContainer}>
       <div ref={containerRef} class={styles.threeContainer}></div>
-      
+
       {/* 進捗表示 */}
       {showProgress() && (
         <div
@@ -385,8 +407,6 @@ export default function CubeScene(): JSX.Element {
           📊 進捗
         </button>
       )}
-      
-
 
       {/* タスク詳細表示 */}
       {selectedTask() && (
@@ -416,7 +436,7 @@ export default function CubeScene(): JSX.Element {
             "z-index": 3000,
             "font-weight": "bold",
             "font-size": "1.1rem",
-            animation: "fadeInOut 3s ease-in-out"
+            animation: "fadeInOut 3s ease-in-out",
           }}
         >
           {addTaskMessage()}
@@ -425,7 +445,7 @@ export default function CubeScene(): JSX.Element {
 
       {/* フローティングアクションボタン */}
       {!showInput() && (
-        <button 
+        <button
           class={`${styles.fab} ${styles.globalFab}`}
           onClick={() => setShowInput(true)}
           title="新しいタスクを追加"
@@ -455,24 +475,270 @@ export default function CubeScene(): JSX.Element {
               onInput={(e) => setNewItemDetail(e.target.value)}
               onKeyDown={handleKeyDown}
             />
-            <button 
-              onClick={handleAddTask} 
-              disabled={loading()}
-            >
+            <button onClick={handleAddTask} disabled={loading()}>
               {loading() ? "追加中..." : "追加 (Cmd+Enter)"}
             </button>
             {error() && (
-              <p style={{
-                "color": "#e74c3c",
-                "margin": "8px 0 0 0",
-                "font-size": "0.9rem"
-              }}>
+              <p
+                style={{
+                  color: "#e74c3c",
+                  margin: "8px 0 0 0",
+                  "font-size": "0.9rem",
+                }}
+              >
                 {error()}
               </p>
             )}
           </div>
         </div>
       )}
+
+      {/* スクラッチカード */}
+      {showScratchCard() === true && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            display: "flex",
+            "justify-content": "center",
+            "align-items": "center",
+            "z-index": 500,
+          }}
+        >
+          <div
+            style={{
+              width: "400px",
+              height: "600px",
+              position: "relative",
+              background:
+                "radial-gradient(circle, rgba(224, 0, 50, 1) 0%, rgba(253, 2, 52, 1) 78%, rgba(214, 1, 51, 1) 100%)",
+              "box-shadow": "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              "justify-content": "center",
+              "align-items": "center",
+              "border-radius": "12px",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "100%",
+                transform: "translate(-50%, -200px)",
+                "text-align": "center",
+                color: "white",
+                "font-weight": "bold",
+                "font-size": "24px",
+                "z-index": 1000,
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                "justify-content": "center",
+                "line-height": "1",
+                "pointer-events": "none",
+              }}
+            >
+              <span
+                style={{
+                  "font-size": "32px",
+                  color: "#000",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "12px",
+                  "-webkit-text-stroke-color": "#000",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                ToDo
+              </span>
+              <span
+                style={{
+                  "font-size": "48px",
+                  color: "black",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "20px",
+                  "-webkit-text-stroke-color": "black",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                スクラッチ
+              </span>
+              <span
+                style={{
+                  "font-size": "40px",
+                  color: "#000",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "12px",
+                  "-webkit-text-stroke-color": "#000",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                くじ
+              </span>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "100%",
+                transform: "translate(-50%, -200px)",
+                "text-align": "center",
+                color: "white",
+                "font-weight": "bold",
+                "font-size": "24px",
+                "z-index": 1000,
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                "justify-content": "center",
+                "line-height": "1",
+                "pointer-events": "none",
+              }}
+            >
+              <span
+                style={{
+                  "font-size": "32px",
+                  color: "#fff",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "10px",
+                  "-webkit-text-stroke-color": "#fff",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                ToDo
+              </span>
+              <span
+                style={{
+                  "font-size": "48px",
+                  color: "black",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "20px",
+                  "-webkit-text-stroke-color": "black",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                スクラッチ
+              </span>
+              <span
+                style={{
+                  "font-size": "40px",
+                  color: "#fff",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "10px",
+                  "-webkit-text-stroke-color": "#fff",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                くじ
+              </span>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "100%",
+                transform: "translate(-50%, -200px)",
+                "text-align": "center",
+                color: "white",
+                "font-weight": "bold",
+                "font-size": "24px",
+                "z-index": 1000,
+                display: "flex",
+                "flex-direction": "column",
+                "align-items": "center",
+                "justify-content": "center",
+                "line-height": "1",
+                "pointer-events": "none",
+              }}
+            >
+              <span
+                style={{
+                  "font-size": "32px",
+                  color: "red",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "2px",
+                  "-webkit-text-stroke-color": "red",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                ToDo
+              </span>
+              <span
+                style={{
+                  "font-size": "48px",
+                  color: "white",
+                  "-webkit-text-stroke-width": "3px",
+                  "-webkit-text-stroke-color": "white",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                スクラッチ
+              </span>
+              <span
+                style={{
+                  "font-size": "40px",
+                  color: "red",
+                  "font-weight": "bold",
+                  "-webkit-text-stroke-width": "2px",
+                  "-webkit-text-stroke-color": "red",
+                  "font-family": "NotoSansJP",
+                }}
+              >
+                くじ
+              </span>
+            </div>
+            <div
+              style={{
+                width: "300px",
+                height: "300px",
+                position: "relative",
+                "clip-path": `
+                polygon(
+                  50% 0%,  57% 15%,  70% 0%,  76% 18%,
+                  92% 8%,  85% 26%, 100% 30%, 88% 42%,
+                  100% 50%, 88% 58%, 100% 70%, 85% 74%,
+                  92% 92%, 76% 82%, 70% 100%, 57% 85%,
+                  50% 100%, 43% 85%, 30% 100%, 24% 82%,
+                  8% 92%, 15% 74%, 0% 70%, 12% 58%,
+                  0% 50%, 12% 42%, 0% 30%, 15% 26%,
+                  8% 8%, 24% 18%, 30% 0%, 43% 15%
+                )
+              `,
+              }}
+            >
+              <ScratchToReveal
+                width={300}
+                height={300}
+                minScratchPercentage={30}
+                gradientColors={["#B8B8B8", "#E1DEE2", "#B8B8B8"]}
+                onComplete={() => setShowScratchCard(false)}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    "justify-content": "center",
+                    "align-items": "center",
+                    "font-size": "60px",
+                    background: "white",
+                  }}
+                >
+                  2等
+                  <br />
+                  あたり
+                </div>
+              </ScratchToReveal>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-} 
+}
