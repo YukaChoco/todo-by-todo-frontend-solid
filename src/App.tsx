@@ -18,6 +18,7 @@ import { useTodos } from "./hooks/useTodos";
 import styles from "./App.module.css";
 import { runCowInterpreter } from "./cowInterpreter";
 import { cowPrograms } from "./cowPrograms";
+import { ScratchToReveal } from "./components/magicui/scratch-to-reveal";
 
 const App: Component = () => {
   const [newItem, setNewItem] = createSignal<string>("");
@@ -479,13 +480,16 @@ const App: Component = () => {
           </div>
         </div>
       )}
+      <ScratchToReveal width={300} height={300} minScratchPercentage={50}>
+        Scratch To Reveal
+      </ScratchToReveal>
       <canvas
         style={{
           position: "fixed",
           top: 0,
           left: 0,
           "z-index": 1,
-          "pointer-events": "none",
+          "pointer-events": "auto",
         }}
         width={window.innerWidth}
         height={window.innerHeight}
