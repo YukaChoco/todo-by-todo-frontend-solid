@@ -1,0 +1,156 @@
+.cubeFace {
+  width: 600px;
+  height: 600px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'dartsfont', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.backgroundSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.pageNumber {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabsContainer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 10px 0;
+  padding-top: 15px;
+}
+
+.mainContainer {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 450px;
+  margin: 10px 20px;
+  overflow: visible;
+}
+
+.taskCardWrapper {
+  z-index: 15;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.taskCardWrapper:hover {
+  transform: scale(1.05);
+}
+
+.fab {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffb300;
+  color: #222;
+  font-size: 1.8rem;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  z-index: 1900;
+  transition: background 0.2s;
+}
+
+.fab:hover {
+  background: #ffd54f;
+}
+
+.fabInputOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  z-index: 2000;
+}
+
+.fabInputPopup {
+  background: #fffbe7;
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.18);
+  padding: 20px;
+  margin: 0 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 300px;
+  position: relative;
+  z-index: 2001;
+}
+
+.fabInputPopup input {
+  font-size: 1rem;
+  padding: 8px;
+  border: 1.5px solid #ffb300;
+  border-radius: 8px;
+  outline: none;
+}
+
+.fabInputPopup button {
+  margin-top: 4px;
+  font-size: 1rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  background: #ffb300;
+  color: #222;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fabInputPopup button:hover {
+  background: #ffd54f;
+}
+
+.fabInputPopup button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  color: #222;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin: 0;
+  text-align: center;
+} 

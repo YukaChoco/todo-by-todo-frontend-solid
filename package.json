@@ -16,8 +16,11 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "@types/three": "^0.178.1",
     "motion": "^12.23.6",
     "roughjs": "^4.6.6",
-    "solid-js": "^1.9.5"
+    "solid-js": "^1.9.5",
+    "three": "^0.178.0",
+    "zdog": "^1.1.3"
   }
 }

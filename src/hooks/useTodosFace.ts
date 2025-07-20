@@ -8,38 +8,37 @@ interface Item {
   description: string;
   completed: boolean;
   hue: number;
-  faceId: number;
+  faceId: number; // 面のID (0-5)
 }
 
-// TODO: レスポンスが治ったらもどす
 interface ItemResponse {
   id: number;
   title: string;
   description: string;
   completed: boolean;
+  face_id: number;
 }
 
-export function useTodos() {
-  const [items, setItems] = createSignal<Item[]>([]);
+export function useTodosFace() {
+  const [allItems, setAllItems] = createSignal<Item[]>([]);
   const [loading, setLoading] = createSignal<boolean>(false);
   const userID = 2;
+
+  // 特定の面のアイテムを取得
+  const getItemsByFace = (faceId: number) => {
+    return allItems().filter(item => item.faceId === faceId);
+  };
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const response = await fetch("/todos");
       const data = await response.json();
-      // console.log("data:", data);
-      setItems([
-        ...data
+      
+      setAllItems(
+        data
           .map((item: ItemResponse) => {
-            // console.log("Processing item:", item);
-            // console.log("Description structure:", item.description);
-            // console.log("Description value:", item.description);
-
-            // descriptionの安全な取得
             const description = item.description || "";
-            // console.log("Final description:", description);
             const result = runCowInterpreter(
               cowPrograms,
               item.title + description
@@ -55,13 +54,13 @@ export function useTodos() {
               description: description,
               completed: item.completed,
               hue: hue,
-              faceId: page,
+              faceId: page || 0, // デフォルトは面0
             };
           })
-          .reverse(), // 配列の順序を逆にして古い順に
-      ]);
+          .reverse()
+      );
     } catch (error) {
-      // console.error("Error fetching todos:", error);
+      console.error("Error fetching todos:", error);
     } finally {
       setLoading(false);
     }
@@ -87,10 +86,9 @@ export function useTodos() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // ローカル状態を更新（refetchしない）
-      fetchData();
+      await fetchData();
     } catch (error) {
-      // console.error("Error:", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -107,6 +105,7 @@ export function useTodos() {
         body: JSON.stringify({
           ...item,
           completed: !item.completed,
+          face_id: item.faceId,
         }),
       });
 
@@ -114,8 +113,7 @@ export function useTodos() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // ローカル状態を更新（refetchしない）
-      setItems((prev) =>
+      setAllItems((prev) =>
         prev.map((prevItem) =>
           prevItem.id === item.id
             ? { ...prevItem, completed: !prevItem.completed }
@@ -123,7 +121,7 @@ export function useTodos() {
         )
       );
     } catch (error) {
-      // console.error("Error:", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -140,20 +138,21 @@ export function useTodos() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      setItems((prev) => prev.filter((i) => i.id !== item.id));
+      setAllItems((prev) => prev.filter((i) => i.id !== item.id));
     } catch (error) {
-      // console.error("Error:", error);
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   return {
-    items,
+    allItems,
+    getItemsByFace,
     loading,
     fetchData,
     addItem,
     toggleItem,
     deleteItem,
   };
-}
+} 
