@@ -1,4 +1,4 @@
-import { JSX, createMemo } from "solid-js";
+import { JSX, createMemo, For } from "solid-js";
 import HanddrawnPieChart from "./HanddrawnPieChart";
 import HanddrawnLargeNumber from "./HanddrawnLargeNumber";
 import HanddrawnIconButton from "../ui/HanddrawnIconButton";
@@ -7,7 +7,10 @@ import styles from "./HanddrawnProgressDisplay.module.css";
 interface HanddrawnProgressDisplayProps {
   totalTasks: number;
   completedTasks: number;
+  currentPage: number;
+  pageLabels: string[];
   onClose?: () => void;
+  onPageSelect?: (pageId: number) => void;
 }
 
 export default function HanddrawnProgressDisplay(props: HanddrawnProgressDisplayProps): JSX.Element {
@@ -32,6 +35,30 @@ export default function HanddrawnProgressDisplay(props: HanddrawnProgressDisplay
             />
           </div>
         )}
+      </div>
+      
+      {/* ページ選択ドロップダウン */}
+      <div class={styles.pageSelector}>
+        <select 
+          value={props.currentPage}
+          onChange={(e) => props.onPageSelect?.(parseInt(e.target.value))}
+          style={{
+            "font-size": "1rem",
+            "padding": "6px 8px",
+            "border": "2px solid #ffb300",
+            "border-radius": "8px",
+            "outline": "none",
+            "background": "#fffbe7",
+            "color": "#333",
+            "cursor": "pointer"
+          }}
+        >
+          <For each={props.pageLabels}>
+            {(label, index) => (
+              <option value={index()}>ページ {label}</option>
+            )}
+          </For>
+        </select>
       </div>
       
       <div class={styles.content}>

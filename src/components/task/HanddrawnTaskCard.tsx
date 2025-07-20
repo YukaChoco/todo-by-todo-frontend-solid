@@ -110,16 +110,19 @@ export default function HanddrawnTaskCard(props: HanddrawnTaskCardProps): JSX.El
 
   // ドラッグ&ドロップのハンドラー
   const handleMouseDown = (e: MouseEvent) => {
-    setIsDragging(true);
-    props.onDragStart?.(e);
-    
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      props.onDragEnd?.();
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mouseup', handleMouseUp);
+    // propsで渡されたonDragStartを呼び出し
+    if (props.onDragStart) {
+      props.onDragStart(e);
+      setIsDragging(true);
+      
+      const handleMouseUp = () => {
+        setIsDragging(false);
+        props.onDragEnd?.();
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+      
+      document.addEventListener('mouseup', handleMouseUp);
+    }
   };
 
   // カードクリックハンドラー
