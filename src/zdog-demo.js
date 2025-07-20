@@ -375,8 +375,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // アニメーションループ
   function animate() {
-    // illo.rotate.y += 0.01;
-    // illo.rotate.x += 0.005;
+    var time = Date.now() * 0.001;
+
+    // ハリネズミを画面全面で走り回らせる
+    hedgehog.translate.x = Math.sin(time * 1.5) * 300; // 左右の動き（画面幅全体）
+    hedgehog.translate.y = Math.cos(time * 1.2) * 200; // 上下の動き（画面高さ全体）
+    hedgehog.translate.z = Math.sin(time * 0.8) * 50; // 奥行きの動き
+    hedgehog.rotate.y = Math.sin(time * 2) * 0.5; // 体の傾き
+    hedgehog.rotate.z = Math.sin(time * 1.8) * 0.3; // 体の回転
+
+    // 足の動きをシミュレート
+    legPositions.forEach((pos, index) => {
+      var leg = hedgehog.children.find(
+        (child) =>
+          child.translate.x === pos.x &&
+          child.translate.y === pos.y &&
+          child.translate.z === pos.z
+      );
+      if (leg) {
+        leg.rotate.x = Math.sin(time * 3 + index * 0.5) * 0.4;
+      }
+    });
+
     illo.updateRenderGraph();
     requestAnimationFrame(animate);
   }
