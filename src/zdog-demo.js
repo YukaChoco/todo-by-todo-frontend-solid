@@ -87,9 +87,12 @@ document.addEventListener("DOMContentLoaded", function () {
     backface: true,
   });
 
-  // 目
-  new Zdog.Shape({
+  //
+  var eyeGroup = new Zdog.Group({
     addTo: head,
+  });
+  new Zdog.Shape({
+    addTo: eyeGroup,
     path: [
       { x: 0, y: 0 },
       { x: 0, y: 0 },
@@ -100,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
     backface: true,
   });
   new Zdog.Shape({
-    addTo: head,
+    addTo: eyeGroup,
     path: [
       { x: 0, y: 0 },
       { x: 0, y: 0 },
@@ -114,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   new Zdog.Shape({
-    addTo: head,
+    addTo: eyeGroup,
     path: [
       { x: 0, y: 0 },
       { x: 0, y: 0 },
@@ -125,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     backface: true,
   });
   new Zdog.Shape({
-    addTo: head,
+    addTo: eyeGroup,
     path: [
       { x: 0, y: 0 },
       { x: 0, y: 0 },
