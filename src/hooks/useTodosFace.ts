@@ -95,6 +95,7 @@ export function useTodosFace() {
   };
 
   const toggleItem = async (item: Item) => {
+    console.log("toggleItem:", item);
     setLoading(true);
     try {
       const response = await fetch(`/todos/${item.id}`, {
@@ -104,6 +105,7 @@ export function useTodosFace() {
         },
         body: JSON.stringify({
           ...item,
+          user_id: userID,
           completed: !item.completed,
           face_id: item.faceId,
         }),
