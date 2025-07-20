@@ -8,6 +8,7 @@ interface Item {
   description: string;
   completed: boolean;
   hue: number;
+  faceId: number;
 }
 
 // TODO: レスポンスが治ったらもどす
@@ -45,12 +46,16 @@ export function useTodos() {
             );
             const hue = Number(result[0].charCodeAt(0));
 
+            const page = Math.floor((hue % 360) / 60);
+            console.log("page:", page);
+
             return {
               id: item.id,
               title: item.title,
               description: description,
               completed: item.completed,
               hue: hue,
+              faceId: page,
             };
           })
           .reverse(), // 配列の順序を逆にして古い順に

@@ -27,7 +27,6 @@ export default function CubeScene(): JSX.Element {
   const [showInput, setShowInput] = createSignal(false);
   const [newItem, setNewItem] = createSignal<string>("");
   const [newItemDetail, setNewItemDetail] = createSignal<string>("");
-  const [selectedFaceId, setSelectedFaceId] = createSignal<number>(0);
   const [error, setError] = createSignal<string>("");
 
   // Todo管理フック
@@ -66,8 +65,8 @@ export default function CubeScene(): JSX.Element {
       return;
     }
 
-    // APIを通じてアイテムを追加
-    await addItem(newItem(), newItemDetail(), selectedFaceId());
+    // APIを通じてアイテムを追加（ページは自動判定）
+    await addItem(newItem(), newItemDetail());
     
     // フォームをリセット
     setNewItem("");
@@ -140,14 +139,16 @@ export default function CubeScene(): JSX.Element {
     let previousMousePosition = { x: 0, y: 0 };
 
     const handleMouseDown = (event: MouseEvent) => {
-      if (isRotating()) return;
+      // コマンドキーが押されている場合は立方体の回転を無効にする
+      if (isRotating() || event.metaKey || event.ctrlKey) return;
       isDragging = true;
       previousMousePosition = { x: event.clientX, y: event.clientY };
       renderer.domElement.style.cursor = 'grabbing';
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!isDragging || isRotating()) return;
+      // コマンドキーが押されている場合は立方体の回転を無効にする
+      if (!isDragging || isRotating() || event.metaKey || event.ctrlKey) return;
 
       const deltaX = event.clientX - previousMousePosition.x;
       const deltaY = event.clientY - previousMousePosition.y;
@@ -332,26 +333,6 @@ export default function CubeScene(): JSX.Element {
             class={styles.fabInputPopup}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* 面選択 */}
-            <select
-              value={selectedFaceId()}
-              onChange={(e) => setSelectedFaceId(parseInt(e.target.value))}
-              style={{
-                "font-size": "1rem",
-                "padding": "8px",
-                "border": "1.5px solid #ffb300",
-                "border-radius": "8px",
-                "outline": "none",
-                "margin-bottom": "8px"
-              }}
-            >
-              <For each={faceLabels}>
-                {(label, index) => (
-                  <option value={index()}>{label}</option>
-                )}
-              </For>
-            </select>
-
             <input
               type="text"
               placeholder="タスクを入力..."

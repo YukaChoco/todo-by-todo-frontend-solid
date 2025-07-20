@@ -45,13 +45,16 @@ export function useTodosFace() {
             );
             const hue = Number(result[0].charCodeAt(0));
 
+            const page = Math.floor((hue % 360) / 60);
+            console.log("page:", page);
+
             return {
               id: item.id,
               title: item.title,
               description: description,
               completed: item.completed,
               hue: hue,
-              faceId: item.face_id || 0, // デフォルトは面0
+              faceId: page || 0, // デフォルトは面0
             };
           })
           .reverse()
@@ -63,7 +66,7 @@ export function useTodosFace() {
     }
   };
 
-  const addItem = async (title: string, description: string = "", faceId: number = 0) => {
+  const addItem = async (title: string, description: string = "") => {
     setLoading(true);
     try {
       const response = await fetch("/todos", {
@@ -76,7 +79,6 @@ export function useTodosFace() {
           title: title,
           description: description,
           completed: false,
-          face_id: faceId,
         }),
       });
 

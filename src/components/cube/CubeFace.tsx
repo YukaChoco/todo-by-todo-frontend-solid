@@ -36,6 +36,8 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
   const [category, setCategory] = createSignal<string>("すべて");
   const [backgroundColor, setBackgroundColor] = createSignal<string>("#282c34");
   const [selectedTaskId, setSelectedTaskId] = createSignal<number | null>(null);
+  const [draggedItem, setDraggedItem] = createSignal<number | null>(null);
+  const [dragOffset, setDragOffset] = createSignal<{ x: number; y: number }>({ x: 0, y: 0 });
   
   // グローバル位置管理を使用
   const { getPosition, setPosition, hasPosition } = useGlobalPositions();
@@ -81,7 +83,51 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
     return props.items;
   };
 
+  // タスクカードのドラッグ処理
+  const handleDragStart = (itemId: number, e: MouseEvent) => {
+    // Cmdキー（Mac）またはCtrlキー（Windows）が押されている場合のみドラッグを開始
+    if (!(e.metaKey || e.ctrlKey)) {
+      return;
+    }
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setDraggedItem(itemId);
+    const currentPosition = getPosition(itemId) || { top: 0, left: 0 };
+    const target = e.currentTarget as HTMLElement;
+    const containerRect = target?.closest('.main-container')?.getBoundingClientRect();
+    
+    if (containerRect) {
+      const offsetX = e.clientX - containerRect.left - currentPosition.left;
+      const offsetY = e.clientY - containerRect.top - currentPosition.top;
+      setDragOffset({ x: offsetX, y: offsetY });
+    }
+  };
 
+  const handleDragEnd = () => {
+    setDraggedItem(null);
+    setDragOffset({ x: 0, y: 0 });
+  };
+
+  // マウス移動処理
+  const handleMouseMove = (e: MouseEvent) => {
+    const draggedItemId = draggedItem();
+    if (draggedItemId === null) return;
+    
+    const target = e.currentTarget as HTMLElement;
+    const containerRect = target?.getBoundingClientRect();
+    if (containerRect) {
+      const newLeft = e.clientX - containerRect.left - dragOffset().x;
+      const newTop = e.clientY - containerRect.top - dragOffset().y;
+      
+      // 境界チェック（containerの範囲内に制限）
+      const boundedLeft = Math.max(0, Math.min(newLeft, 410)); // 410px = 600 - 150 - 40 (カード幅とマージン)
+      const boundedTop = Math.max(0, Math.min(newTop, 200)); // 200px = mainContainer高さ - カード高さ
+      
+      setPosition(draggedItemId, { left: boundedLeft, top: boundedTop });
+    }
+  };
 
   // タスクの座標を管理 - 位置を永続化
   createEffect(() => {
@@ -121,7 +167,7 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
       </div>
 
       {/* メインコンテンツエリア */}
-      <main class={`${styles.mainContainer} main-container`}>
+      <main class={`${styles.mainContainer} main-container`} onMouseMove={handleMouseMove} onMouseUp={handleDragEnd}>
         <For each={filteredItems()}>
           {(item) => {
             const position = () => getPosition(item.id) || { top: 0, left: 0 };
@@ -134,16 +180,18 @@ export default function CubeFace(props: CubeFaceProps): JSX.Element {
                   top: `${position().top}px`,
                   left: `${position().left}px`,
                 }}
-                onClick={() => {
-                  setSelectedTaskId(item.id);
-                  props.onTaskClick?.(item.id);
-                }}
               >
                 <HanddrawnTaskCard
                   name={item.title}
                   completed={item.completed}
                   hue={item.hue}
                   priority="medium"
+                  onDragStart={(e) => handleDragStart(item.id, e)}
+                  onDragEnd={handleDragEnd}
+                  onClick={() => {
+                    setSelectedTaskId(item.id);
+                    props.onTaskClick?.(item.id);
+                  }}
                 >
                   <HanddrawnCheckbox
                     checked={item.completed}
