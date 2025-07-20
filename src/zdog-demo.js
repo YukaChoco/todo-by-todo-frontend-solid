@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
       addTo: hedgehog,
       path: [
         { x: 0, y: 0, z: 0 },
-        { x: 0, y: 0, z: -40 * Math.random() - 5 },
+        { x: 0, y: 0, z: -40 * Math.random() - 15 },
       ],
       stroke: 15,
       color: yellow,
@@ -331,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
       addTo: head,
       path: [
         { x: 0, y: 0, z: 0 },
-        { x: 0, y: 0, z: -40 * Math.random() - 5 },
+        { x: 0, y: 0, z: -40 * Math.random() - 15 },
       ],
       stroke: 15,
       color: yellow,
