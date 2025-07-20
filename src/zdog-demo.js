@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightBrown = "#D2691E";
   var cream = "#F1F0ED";
   var yellow = "#EFB91B";
+  var glassColor = "#639BC0";
+  var eyeBlowColor = "#856558";
 
   var illo = new Zdog.Illustration({
     element: ".zdog-canvas",
@@ -136,6 +138,98 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 5,
     color: cream,
     translate: { z: 30, x: -20, y: -2 },
+    front: { z: 2 },
+    updateSort: true,
+    backface: true,
+  });
+
+  var glassGroup = new Zdog.Group({
+    addTo: head,
+    translate: { z: 30, x: 0, y: -20 },
+  });
+
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 20, y: 0 },
+      { x: -20, y: 0 },
+    ],
+    stroke: 6,
+    color: blueGrayColor,
+    translate: { z: 0, x: 0, y: 0 },
+    backface: true,
+  });
+
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 6,
+    color: eyeBlowColor,
+    translate: { z: 0, x: 20, y: 8 },
+    rotate: { x: 0, y: 0, z: 0.2 },
+    backface: true,
+  });
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 6,
+    color: eyeBlowColor,
+    translate: { z: 0, x: -20, y: 8 },
+    rotate: { x: 0, y: 0, z: -0.2 },
+    backface: true,
+  });
+
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 16,
+    color: blueGrayColor,
+    translate: { z: 0, x: 20, y: 0 },
+    backface: true,
+  });
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 8,
+    color: glassColor,
+    translate: { z: 0, x: 20, y: 0 },
+    front: { z: 2 },
+    updateSort: true,
+    backface: true,
+  });
+
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 16,
+    color: blueGrayColor,
+    translate: { z: 0, x: -20, y: 0 },
+    backface: true,
+  });
+  new Zdog.Shape({
+    addTo: glassGroup,
+    path: [
+      { x: 5, y: 0 },
+      { x: -5, y: 0 },
+    ],
+    stroke: 8,
+    color: glassColor,
+    translate: { z: 0, x: -20, y: 0 },
     front: { z: 2 },
     updateSort: true,
     backface: true,
