@@ -22,12 +22,14 @@ export default function CubeScene(): JSX.Element {
   const [isRotating, setIsRotating] = createSignal(false);
   const [showProgress, setShowProgress] = createSignal(true);
   const [selectedTaskId, setSelectedTaskId] = createSignal<number | null>(null);
+  const [currentPage, setCurrentPage] = createSignal<number>(0); // 現在表示中のページ
   
   // フローティングボタン用の状態
   const [showInput, setShowInput] = createSignal(false);
   const [newItem, setNewItem] = createSignal<string>("");
   const [newItemDetail, setNewItemDetail] = createSignal<string>("");
   const [error, setError] = createSignal<string>("");
+  const [addTaskMessage, setAddTaskMessage] = createSignal<string>("");
 
   // Todo管理フック
   const {
@@ -40,14 +42,74 @@ export default function CubeScene(): JSX.Element {
     deleteItem,
   } = useTodosFace();
 
-  // 進捗計算
+  // 進捗計算（全体）
   const totalTasks = () => allItems().length;
   const completedTasks = () => allItems().filter((item) => item.completed).length;
+
+  // ページごとの進捗計算
+  const getPageProgress = (pageId: number) => {
+    const pageItems = getItemsByFace(pageId);
+    const total = pageItems.length;
+    const completed = pageItems.filter(item => item.completed).length;
+    return { total, completed };
+  };
+
+  // 現在のページの進捗
+  const currentPageProgress = () => getPageProgress(currentPage());
 
   // 選択されたタスクを取得
   const selectedTask = () => {
     const taskId = selectedTaskId();
     return taskId ? allItems().find((item) => item.id === taskId) || null : null;
+  };
+
+  // 立方体を特定のページに回転させる
+  const rotateCubeToPage = (pageId: number) => {
+    if (!cube) return;
+    
+    setIsRotating(true);
+    const targetRotations = [
+      { x: 0, y: 0 },                    // 前面 (ページ1)
+      { x: 0, y: -Math.PI / 2 },         // 右面 (ページ2)
+      { x: 0, y: Math.PI },              // 後面 (ページ3)
+      { x: 0, y: Math.PI / 2 },          // 左面 (ページ4)
+      { x: Math.PI / 2, y: Math.PI },    // 上面 (ページ5) - X軸回転の符号を修正
+      { x: -Math.PI / 2, y: Math.PI },   // 下面 (ページ6) - X軸回転の符号を修正
+    ];
+    
+    const target = targetRotations[pageId];
+    if (target) {
+      // アニメーション付きで回転
+      const startRotation = { x: cube.rotation.x, y: cube.rotation.y };
+      const duration = 800; // ms
+      const startTime = Date.now();
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // イージング関数（ease-out）
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        cube.rotation.x = startRotation.x + (target.x - startRotation.x) * easeOut;
+        cube.rotation.y = startRotation.y + (target.y - startRotation.y) * easeOut;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          setIsRotating(false);
+        }
+      };
+      
+      animate();
+    }
+    
+    setCurrentPage(pageId);
+  };
+
+  // ページ選択ハンドラー
+  const handlePageSelect = (pageId: number) => {
+    rotateCubeToPage(pageId);
   };
 
   // CubeFace用の拡張されたハンドラー
@@ -65,8 +127,21 @@ export default function CubeScene(): JSX.Element {
       return;
     }
 
+    // タスクのページを事前に計算（useTodosFaceと同じロジック）
+    const taskText = newItem() + newItemDetail();
+    const cowResult = runCowInterpreter(cowPrograms, taskText);
+    const hue = Number(cowResult[0].charCodeAt(0));
+    const calculatedPage = Math.floor((hue % 360) / 60);
+
     // APIを通じてアイテムを追加（ページは自動判定）
     await addItem(newItem(), newItemDetail());
+    
+    // 計算したページに移動とメッセージ表示
+    setAddTaskMessage(`タスクをページ${faceLabels[calculatedPage]}に追加しました`);
+    setTimeout(() => setAddTaskMessage(""), 3000);
+    
+    // そのページに移動
+    rotateCubeToPage(calculatedPage);
     
     // フォームをリセット
     setNewItem("");
@@ -139,16 +214,18 @@ export default function CubeScene(): JSX.Element {
     let previousMousePosition = { x: 0, y: 0 };
 
     const handleMouseDown = (event: MouseEvent) => {
-      // コマンドキーが押されている場合は立方体の回転を無効にする
-      if (isRotating() || event.metaKey || event.ctrlKey) return;
+      // タスクカード要素をクリックしている場合は立方体の回転を無効にする
+      const target = event.target as HTMLElement;
+      const isTaskCard = target.closest('.task-card-wrapper') || target.closest('[class*="HanddrawnTaskCard"]');
+      
+      if (isRotating() || isTaskCard) return;
       isDragging = true;
       previousMousePosition = { x: event.clientX, y: event.clientY };
       renderer.domElement.style.cursor = 'grabbing';
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      // コマンドキーが押されている場合は立方体の回転を無効にする
-      if (!isDragging || isRotating() || event.metaKey || event.ctrlKey) return;
+      if (!isDragging || isRotating()) return;
 
       const deltaX = event.clientX - previousMousePosition.x;
       const deltaY = event.clientY - previousMousePosition.y;
@@ -240,6 +317,11 @@ export default function CubeScene(): JSX.Element {
       object.position.set(position[0], position[1], position[2]);
       object.rotation.set(rotations[index][0], rotations[index][1], rotations[index][2]);
       
+      // 上面と下面の左右反転を修正
+      if (index === 4 || index === 5) { // 上面(4)と下面(5)
+        object.scale.set(-1, 1, 1); // X軸方向を反転
+      }
+      
       cube.add(object);
       faceElements[index] = element;
     });
@@ -271,9 +353,12 @@ export default function CubeScene(): JSX.Element {
           }}
         >
           <HanddrawnProgressDisplay
-            totalTasks={totalTasks()}
-            completedTasks={completedTasks()}
+            totalTasks={currentPageProgress().total}
+            completedTasks={currentPageProgress().completed}
+            currentPage={currentPage()}
+            pageLabels={faceLabels}
             onClose={() => setShowProgress(false)}
+            onPageSelect={handlePageSelect}
           />
         </div>
       )}
@@ -313,6 +398,29 @@ export default function CubeScene(): JSX.Element {
           priority="medium"
           onClose={() => setSelectedTaskId(null)}
         />
+      )}
+
+      {/* タスク追加通知メッセージ */}
+      {addTaskMessage() && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "rgba(255, 179, 0, 0.95)",
+            color: "#222",
+            padding: "16px 24px",
+            "border-radius": "12px",
+            "box-shadow": "0 4px 16px rgba(0, 0, 0, 0.2)",
+            "z-index": 3000,
+            "font-weight": "bold",
+            "font-size": "1.1rem",
+            animation: "fadeInOut 3s ease-in-out"
+          }}
+        >
+          {addTaskMessage()}
+        </div>
       )}
 
       {/* フローティングアクションボタン */}
