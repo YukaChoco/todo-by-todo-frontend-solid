@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightBlueGrayColor = "#5A5C5B";
   var darkBrown = "#654321";
   var lightBrown = "#D2691E";
-  var cream = "#F5DEB3";
+  var cream = "#F1F0ED";
   var yellow = "#EFB91B";
 
   var illo = new Zdog.Illustration({
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ハリネズミの体
-  var body = new Zdog.Cone({
+  new Zdog.Cone({
     addTo: hedgehog,
     diameter: 20,
     length: 40,
@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     fill: true,
     rotate: { x: Zdog.TAU / 4, y: 0, z: 0 },
     translate: { y: 50, z: 25 },
+    backface: true,
   });
 
   // アーモンド
@@ -63,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 90,
     color: bodyColor,
     translate: { z: 30, y: -60 },
+    backface: true,
   });
 
   // 鼻
@@ -72,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 30,
     color: noseColor,
     translate: { z: 40, y: 10 },
+    backface: true,
   });
 
   //   鼻の頭の部分
@@ -81,30 +84,59 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 10,
     color: blueGrayColor,
     translate: { z: 20, y: -5 },
+    backface: true,
   });
 
   // 目
-  //   new Zdog.Shape({
-  //     addTo: head,
-  //     path: [
-  //       { x: 0, y: 0 },
-  //       { x: 0, y: 4 },
-  //     ],
-  //     stroke: 4,
-  //     color: black,
-  //     translate: { z: 20, x: -15, y: -10 },
-  //   });
+  new Zdog.Shape({
+    addTo: head,
+    path: [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ],
+    stroke: 12,
+    color: blueGrayColor,
+    translate: { z: 30, x: 20, y: 0 },
+    backface: true,
+  });
+  new Zdog.Shape({
+    addTo: head,
+    path: [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ],
+    stroke: 5,
+    color: cream,
+    translate: { z: 30, x: 20, y: -2 },
+    front: { z: 2 },
+    updateSort: true,
+    backface: true,
+  });
 
-  //   new Zdog.Shape({
-  //     addTo: head,
-  //     path: [
-  //       { x: 0, y: 0 },
-  //       { x: 0, y: 4 },
-  //     ],
-  //     stroke: 4,
-  //     color: black,
-  //     translate: { z: 20, x: 15, y: -10 },
-  //   });
+  new Zdog.Shape({
+    addTo: head,
+    path: [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ],
+    stroke: 12,
+    color: blueGrayColor,
+    translate: { z: 30, x: -20, y: 0 },
+    backface: true,
+  });
+  new Zdog.Shape({
+    addTo: head,
+    path: [
+      { x: 0, y: 0 },
+      { x: 0, y: 0 },
+    ],
+    stroke: 5,
+    color: cream,
+    translate: { z: 30, x: -20, y: -2 },
+    front: { z: 2 },
+    updateSort: true,
+    backface: true,
+  });
 
   // 耳
   //   new Zdog.Ellipse({
@@ -142,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
       stroke: 30,
       color: bodyColor,
       translate: pos,
+      backface: true,
     });
   });
 
@@ -153,6 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 15,
     color: blueGrayColor,
     translate: { x: 30, y: 0, z: 80 }, // 前足左
+    backface: true,
   });
   new Zdog.Cone({
     addTo: hedgehog,
@@ -161,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
     stroke: 15,
     color: lightBlueGrayColor,
     translate: { x: 30, y: 0, z: 100 }, // 前足左
+    backface: true,
   });
 
   // 体の針
@@ -182,6 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
       color: yellow,
       translate: { x: x * 5, y: y * 20 + 10, z: 10 },
       rotate: { x: Math.random() * 3.5 - 1.5, y: Math.random() * 3.5 - 1.5 },
+      backface: true,
     });
   }
 
@@ -204,6 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
       color: yellow,
       translate: { x: x * 5, y: y * 20, z: -15 },
       rotate: { x: Math.random() * 3.5 - 1.5, y: Math.random() * 3.5 - 1.5 },
+      backface: true,
     });
   }
   //   var headSpineCount = 150;
