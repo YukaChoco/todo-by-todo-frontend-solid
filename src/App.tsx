@@ -11,7 +11,7 @@ const App: Component = () => {
           top: 0,
           left: 0,
           "z-index": 1,
-          "pointer-events": "auto",
+          "pointer-events": "none",
         }}
         width={window.innerWidth}
         height={window.innerHeight}
