@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var darkBrown = "#654321";
   var lightBrown = "#D2691E";
   var cream = "#F5DEB3";
-  var black = "#000000";
+  var yellow = "#EFB91B";
 
   var illo = new Zdog.Illustration({
     element: ".zdog-canvas",
@@ -163,24 +163,67 @@ document.addEventListener("DOMContentLoaded", function () {
     translate: { x: 30, y: 0, z: 100 }, // 前足左
   });
 
-  // 針（背中に複数の小さな円錐）
-  //   var spineCount = 15;
-  //   for (var i = 0; i < spineCount; i++) {
-  //     var angle = i / spineCount;
-  //     var radius = 40 + Math.random() * 20;
+  // 体の針
+  var bodySpineCount = 500;
+  for (var i = 0; i < bodySpineCount; i++) {
+    var angle = (i / bodySpineCount) * Math.PI * 2;
+    var radius = 5 + Math.random() * 30;
+    var x = Math.random() * 3.5 - 3;
+    var y = Math.random() * 3.5 - 1;
+    // 頭の丸みに沿わせる
+
+    new Zdog.Shape({
+      addTo: hedgehog,
+      path: [
+        { x: 0, y: 0, z: 0 },
+        { x: 0, y: 0, z: -40 * Math.random() - 5 },
+      ],
+      stroke: 15,
+      color: yellow,
+      translate: { x: x * 5, y: y * 20 + 10, z: 10 },
+      rotate: { x: Math.random() * 3.5 - 1.5, y: Math.random() * 3.5 - 1.5 },
+    });
+  }
+
+  // 頭の針（少なめ）
+  var headSpineCount = 300;
+  for (var i = 0; i < headSpineCount; i++) {
+    var angle = (i / headSpineCount) * Math.PI * 2;
+    var radius = 5 + Math.random() * 30;
+    var x = Math.random() * 3.5 - 3;
+    var y = Math.random() * 3.5 - 1;
+    // 頭の丸みに沿わせる
+
+    new Zdog.Shape({
+      addTo: head,
+      path: [
+        { x: 0, y: 0, z: 0 },
+        { x: 0, y: 0, z: -40 * Math.random() - 5 },
+      ],
+      stroke: 15,
+      color: yellow,
+      translate: { x: x * 5, y: y * 20, z: -15 },
+      rotate: { x: Math.random() * 3.5 - 1.5, y: Math.random() * 3.5 - 1.5 },
+    });
+  }
+  //   var headSpineCount = 150;
+  //   for (var i = 0; i < headSpineCount; i++) {
+  //     var angle = (i / headSpineCount) * Math.PI * 2;
+  //     var radius = 5 + Math.random() * 35;
   //     var x = Math.cos(angle) * radius;
-  //     var y = Math.sin(angle) * radius - 30;
+  //     var y = Math.sin(angle) * radius;
+  //     // 頭の丸みに沿わせる
 
   //     new Zdog.Shape({
-  //       addTo: hedgehog,
+  //       addTo: head,
   //       path: [
-  //         { x: 0, y: 0 },
-  //         { x: 0, y: -15 },
+  //         { x: 0, y: 0, z: 0 },
+  //         { x: 0, y: 0, z: 12 * Math.random() * 2 },
   //       ],
-  //       stroke: 8,
+  //       stroke: 15,
   //       color: darkBrown,
-  //       translate: { x: x, y: y, z: 25 },
-  //       rotate: { x: Math.random() * 0.5 - 0.25, y: Math.random() * 0.5 - 0.25 },
+  //       translate: { x: x, y: y, z: -35 },
+  //       rotate: { x: Math.random() * 0.2 - 0.1, y: Math.random() * 0.2 - 0.1 },
   //     });
   //   }
 
